@@ -1,0 +1,31 @@
+# Maven
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Docker
+Dockerfile
+Dockerfile.dev
+docker-compose*.yml
+.dockerignore
+
+# Sensitive
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store

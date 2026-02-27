@@ -1,0 +1,16 @@
+/.metadata/
+# Maven
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ
+.idea/
+*.iml 
+
+# JAR générés
+*.jar
+*.war
