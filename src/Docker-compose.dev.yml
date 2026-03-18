@@ -38,9 +38,9 @@ services:
       dockerfile: Dockerfile
     container_name: recruti_backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/springBase
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/springBase
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_PASSWORD: Aswfthbkom2459?!*
       SPRING_DEVTOOLS_RESTART_ENABLED: true
     ports:
       - "9091:8080"
