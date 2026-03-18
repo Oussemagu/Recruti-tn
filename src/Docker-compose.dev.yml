@@ -1,6 +1,18 @@
 version: '3.9'
 
 services:
+  frontend:
+    build:
+      context: ./frontend/recruti_front  # Le chemin vers votre dossier frontend
+      dockerfile: Dockerfile
+    container_name: recruti_frontend
+    ports:
+      - "4200:80"  # Mappe le port 80 du conteneur (Nginx) au port 4200 de votre machine
+    depends_on:
+      - backend  # Le frontend dépend du backend, mais attendre n'est pas critique
+    networks:
+      - app-network
+    restart: always
 
   mysql:
     image: mysql:8.0
