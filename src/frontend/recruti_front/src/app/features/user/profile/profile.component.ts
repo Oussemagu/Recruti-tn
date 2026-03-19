@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -11,29 +12,21 @@ import { User } from '../models/user.model';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  user: User = {
-    id: 1,
-    nom: 'Johnson',
-    prenom: 'Sarah',
-    email: 'sarah.j@email.com',
-    role: 'Candidate',
-    dateNaissance: '1995-05-15',
-    skills: 'React, TypeScript, Node.js, Python, Angular',
-    sexe: 'Female',
-    gouvernorat: 'Tunis',
-    poste: 'Software Developer',
-    nomSociete: 'Tech Company Inc',
-    cvGenerique: 'resume.pdf'
-  };
-
+  user!: User;
   skillsList: string[] = [];
   profileCompleteness: number = 85;
 
-  constructor(private router: Router) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    // Parse skills from string
-    this.skillsList = this.user.skills.split(',').map(s => s.trim()).filter(s => s);
+    const userId = 1; // Testing with user ID 1
+    this.userService.getUser(userId).subscribe({
+      next: (data) => {
+        this.user = data;
+        this.skillsList = data.skills ? data.skills.split(',').map(s => s.trim()).filter(s => s) : [];
+      },
+      error: (err) => console.error('Error fetching user:', err)
+    });
   }
 
   editProfile(): void {
@@ -41,7 +34,15 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteAccount(): void {
-    this.router.navigate(['/delete-account']);
+    if (confirm('Are you sure you want to delete your account?')) {
+      this.userService.deleteUser(this.user.id).subscribe({
+        next: () => {
+          alert('Account deleted successfully');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => console.error('Error deleting user:', err)
+      });
+    }
   }
 
   downloadResume(): void {
