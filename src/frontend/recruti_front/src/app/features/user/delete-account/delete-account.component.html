@@ -1,0 +1,76 @@
+<div class="delete-container">
+  <!-- Header -->
+  <div class="delete-header">
+    <h1>Delete Account</h1>
+    <p class="subtitle">This action cannot be undone</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="delete-content">
+    <div class="warning-box">
+      <div class="warning-icon">⚠️</div>
+      <h2>Permanently Delete Your Account</h2>
+      <p>
+        By deleting your account, you will lose access to all your data, including your profile,
+        applications, and messages. This action is permanent and cannot be reversed.
+      </p>
+    </div>
+
+    <!-- Password Verification Form -->
+    <div *ngIf="!showConfirmation" class="section">
+      <h3>Enter Your Password</h3>
+      <p class="description">Confirm your password to delete your account.</p>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Enter your password"
+          (keyup.enter)="verifyPassword()"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-cancel" (click)="cancel()" [disabled]="isLoading">Cancel</button>
+        <button class="btn-verify" (click)="verifyPassword()" [disabled]="isLoading">
+          {{ isLoading ? 'Verifying...' : 'Confirm Delete' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div *ngIf="showConfirmation" class="section">
+      <h3>Confirm Account Deletion</h3>
+
+      <div class="confirmation-message">
+        <p>Your password has been verified. Are you absolutely sure you want to delete your account?</p>
+        <p class="highlight">All your data will be permanently deleted.</p>
+      </div>
+
+      <div class="action-buttons">
+        <button
+          class="btn-keep"
+          (click)="cancel()"
+          [disabled]="isLoading"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn-delete-confirm"
+          (click)="confirmDelete()"
+          [disabled]="isLoading"
+        >
+          {{ isLoading ? 'Deleting...' : 'Yes, Delete My Account' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

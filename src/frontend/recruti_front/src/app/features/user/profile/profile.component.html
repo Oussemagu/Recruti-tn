@@ -1,0 +1,110 @@
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <div>
+      <h1>My Profile</h1>
+      <p class="subtitle">Manage your professional information</p>
+    </div>
+    <button class="btn-primary" (click)="editProfile()">Edit Profile</button>
+  </div>
+
+  <!-- Personal Information Section -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">👤</span>
+      <h2>Personal Information</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>First Name</label>
+        <p>{{ user.prenom }}</p>
+      </div>
+      <div class="info-item">
+        <label>Last Name</label>
+        <p>{{ user.nom }}</p>
+      </div>
+      <div class="info-item">
+        <label>Email</label>
+        <p>{{ user.email }}</p>
+      </div>
+      <div class="info-item">
+        <label>Date of Birth</label>
+        <p>{{ user.dateNaissance }}</p>
+      </div>
+      <div class="info-item">
+        <label>Gender</label>
+        <p>{{ user.sexe }}</p>
+      </div>
+      <div class="info-item">
+        <label>Governorate</label>
+        <p>{{ user.gouvernorat }}</p>
+      </div>
+      <div class="info-item">
+        <label>Role</label>
+        <p>{{ user.role }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional Information Section -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">💼</span>
+      <h2>Professional Information</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Position</label>
+        <p>{{ user.poste }}</p>
+      </div>
+      <div class="info-item">
+        <label>Company Name</label>
+        <p>{{ user.nomSociete }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills Section -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">🏢</span>
+      <h2>Skills</h2>
+    </div>
+    <div class="skills-container">
+      <span class="skill-tag" *ngFor="let skill of skillsList">{{ skill }}</span>
+    </div>
+  </div>
+
+  <!-- Resume Section -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">📄</span>
+      <h2>Resume/CV</h2>
+      <button class="btn-link" (click)="downloadResume()">Download</button>
+    </div>
+    <div class="resume-item">
+      <span class="file-icon">📁</span>
+      <div class="resume-info">
+        <p class="file-name">{{ user.cvGenerique }}</p>
+        <p class="upload-date">Available in your account</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Completeness Section -->
+  <div class="section">
+    <div class="completeness-header">
+      <h2>Profile Completeness</h2>
+      <span class="completeness-percent">{{ profileCompleteness }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="profileCompleteness"></div>
+    </div>
+    <p class="completeness-text">Complete your profile to improve your visibility to recruiters</p>
+  </div>
+
+  <!-- Delete Account Button -->
+  <div class="footer-actions">
+    <button class="btn-delete-account" (click)="deleteAccount()">Delete Account</button>
+  </div>
+</div>

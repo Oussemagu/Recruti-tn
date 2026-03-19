@@ -1,0 +1,149 @@
+<div class="edit-profile-container">
+  <!-- Header -->
+  <div class="edit-profile-header">
+    <div>
+      <h1>My Profile</h1>
+      <p class="subtitle">Manage your professional information</p>
+    </div>
+    <button class="btn-primary" (click)="saveChanges()">Save Changes</button>
+  </div>
+
+  <form>
+    <!-- Personal Information Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">👤</span>
+        <h2>Personal Information</h2>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="prenom">First Name</label>
+          <input type="text" id="prenom" [(ngModel)]="user.prenom" name="prenom" placeholder="First Name">
+        </div>
+        <div class="form-group">
+          <label for="nom">Last Name</label>
+          <input type="text" id="nom" [(ngModel)]="user.nom" name="nom" placeholder="Last Name">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" [(ngModel)]="user.email" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label for="dateNaissance">Date of Birth</label>
+          <input type="date" id="dateNaissance" [(ngModel)]="user.dateNaissance" name="dateNaissance">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="sexe">Gender</label>
+          <select id="sexe" [(ngModel)]="user.sexe" name="sexe">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="gouvernorat">Governorate</label>
+          <input type="text" id="gouvernorat" [(ngModel)]="user.gouvernorat" name="gouvernorat" placeholder="Governorate">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="role">Role</label>
+          <input type="text" id="role" [(ngModel)]="user.role" name="role" placeholder="Role">
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Information Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">💼</span>
+        <h2>Professional Information</h2>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="poste">Position</label>
+          <input type="text" id="poste" [(ngModel)]="user.poste" name="poste" placeholder="Job Title">
+        </div>
+        <div class="form-group">
+          <label for="nomSociete">Company Name</label>
+          <input type="text" id="nomSociete" [(ngModel)]="user.nomSociete" name="nomSociete" placeholder="Company Name">
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">🏢</span>
+        <h2>Skills</h2>
+      </div>
+
+      <div class="skills-container">
+        <div class="skill-tag" *ngFor="let skill of skillsList; let i = index">
+          <span>{{ skill }}</span>
+          <button type="button" class="remove-btn" (click)="removeSkill(i)">×</button>
+        </div>
+      </div>
+
+      <div class="add-skill-group">
+        <input 
+          type="text" 
+          [(ngModel)]="newSkill" 
+          name="newSkill"
+          placeholder="Add a skill..."
+          (keyup.enter)="addSkill()"
+          class="skill-input"
+        >
+        <button type="button" class="btn-add" (click)="addSkill()">
+          <span>+</span> Add
+        </button>
+      </div>
+    </div>
+
+    <!-- Resume/CV Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">📄</span>
+        <h2>Resume/CV</h2>
+      </div>
+
+      <div class="upload-area">
+        <label for="resume" class="upload-label">
+          <div class="upload-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12l7-7 7 7"></path>
+            </svg>
+            <p>Click to upload or drag and drop</p>
+            <p class="file-info">PDF, DOC up to 10MB</p>
+          </div>
+          <input 
+            type="file" 
+            id="resume" 
+            (change)="onFileSelected($event)"
+            accept=".pdf,.doc,.docx"
+            hidden
+          >
+        </label>
+      </div>
+
+      <div *ngIf="resumeFile" class="file-selected">
+        <p class="selected-file">{{ resumeFile.name }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn-save" (click)="saveChanges()">Save Changes</button>
+    </div>
+  </form>
+</div>
