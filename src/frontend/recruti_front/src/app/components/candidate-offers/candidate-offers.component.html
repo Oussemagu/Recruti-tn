@@ -1,0 +1,93 @@
+<section class="mx-auto max-w-7xl p-6">
+  <div class="mb-6 rounded-xl bg-white p-4 shadow">
+    <h1 class="mb-4 text-xl font-semibold text-slate-900">Offres disponibles</h1>
+
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-3 md:grid-cols-4">
+      <div class="md:col-span-2">
+        <label class="mb-1 block text-sm font-medium text-slate-700">Recherche par titre</label>
+        <input
+          type="text"
+          formControlName="titre"
+          placeholder="Ex: Développeur Frontend"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-slate-700">Date début</label>
+        <input
+          type="date"
+          formControlName="dateDebut"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-slate-700">Date fin</label>
+        <input
+          type="date"
+          formControlName="dateFin"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+        />
+      </div>
+
+      <div class="md:col-span-4 flex flex-wrap gap-2">
+        <button
+          type="submit"
+          class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+        >
+          Filtrer
+        </button>
+        <button
+          type="button"
+          (click)="resetFilters()"
+          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Réinitialiser
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+      Chargement en cours...
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      @for (offer of offers; track offer.id) {
+        <article class="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900">{{ offer.titre }}</h2>
+            <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Disponible</span>
+          </div>
+
+          <p class="mb-4 flex-1 text-sm text-slate-700">{{ offer.description }}</p>
+
+          <div class="mb-4 space-y-1 text-sm text-slate-600">
+            <p><span class="font-medium">Tags:</span> {{ offer.tags || 'N/A' }}</p>
+            <p><span class="font-medium">Date d'émission:</span> {{ offer.dateEmission }}</p>
+          </div>
+
+          <button
+            type="button"
+            (click)="postuler(offer)"
+            class="mt-auto rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            Postuler
+          </button>
+        </article>
+      } @empty {
+        <div class="col-span-full rounded-md border border-slate-200 bg-white p-8 text-center text-slate-500">
+          Aucune offre disponible trouvée.
+        </div>
+      }
+    </div>
+  }
+</section>

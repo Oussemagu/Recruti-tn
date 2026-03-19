@@ -1,0 +1,193 @@
+<section class="mx-auto max-w-7xl p-6">
+  <div class="mb-6 flex flex-col gap-4 rounded-xl bg-white p-4 shadow sm:flex-row sm:items-end sm:justify-between">
+    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-slate-700">Recherche par titre</label>
+        <input
+          type="text"
+          [(ngModel)]="searchTitre"
+          (keyup.enter)="applyFilters()"
+          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+          placeholder="Ex: Développeur Angular"
+        />
+      </div>
+
+      <label class="mt-7 inline-flex items-center gap-2 text-sm text-slate-700">
+        <input type="checkbox" [(ngModel)]="filterAvailableOnly" class="h-4 w-4" />
+        Afficher uniquement les offres disponibles
+      </label>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="applyFilters()"
+        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+      >
+        Filtrer
+      </button>
+      <button
+        type="button"
+        (click)="resetFilters()"
+        class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      >
+        Réinitialiser
+      </button>
+      <button
+        type="button"
+        (click)="openCreateModal()"
+        class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+      >
+        Créer une offre
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+      Chargement en cours...
+    </div>
+  } @else {
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">Titre</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">Description</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">Tags</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">Disponible</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">Date d'émission</th>
+              <th class="px-4 py-3 text-right font-semibold text-slate-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (offer of offers; track offer.id) {
+              <tr>
+                <td class="px-4 py-3 font-medium text-slate-900">{{ offer.titre }}</td>
+                <td class="max-w-lg px-4 py-3 text-slate-700">{{ offer.description }}</td>
+                <td class="px-4 py-3 text-slate-700">{{ offer.tags }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="rounded-full px-2 py-1 text-xs font-semibold"
+                    [ngClass]="offer.available ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'"
+                  >
+                    {{ offer.available ? 'Oui' : 'Non' }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-slate-700">{{ offer.dateEmission }}</td>
+                <td class="px-4 py-3 text-right">
+                  <div class="inline-flex gap-2">
+                    <button
+                      type="button"
+                      (click)="openEditModal(offer)"
+                      class="rounded-md border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      (click)="confirmDelete(offer)"
+                      class="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="px-4 py-8 text-center text-slate-500">Aucune offre trouvée.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (showFormModal) {
+    <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
+      <div class="w-full max-w-2xl rounded-xl bg-white p-6 shadow-lg">
+        <h2 class="mb-4 text-xl font-semibold text-slate-900">
+          {{ isEditMode ? 'Modifier l\'offre' : 'Créer une offre' }}
+        </h2>
+
+        <form [formGroup]="offerForm" (ngSubmit)="saveOffer()" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="md:col-span-2">
+            <label class="mb-1 block text-sm font-medium text-slate-700">Titre *</label>
+            <input
+              type="text"
+              formControlName="titre"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+            />
+            @if (offerForm.controls.titre.touched && offerForm.controls.titre.invalid) {
+              <p class="mt-1 text-xs text-red-600">Le titre est obligatoire.</p>
+            }
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="mb-1 block text-sm font-medium text-slate-700">Description *</label>
+            <textarea
+              rows="4"
+              formControlName="description"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+            ></textarea>
+            @if (offerForm.controls.description.touched && offerForm.controls.description.invalid) {
+              <p class="mt-1 text-xs text-red-600">La description est obligatoire.</p>
+            }
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Tags</label>
+            <input
+              type="text"
+              formControlName="tags"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+              placeholder="Angular, Java, SQL"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700">Date d'émission *</label>
+            <input
+              type="date"
+              formControlName="dateEmission"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+            />
+            @if (offerForm.controls.dateEmission.touched && offerForm.controls.dateEmission.invalid) {
+              <p class="mt-1 text-xs text-red-600">La date est obligatoire.</p>
+            }
+          </div>
+
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700 md:col-span-2">
+            <input type="checkbox" formControlName="available" class="h-4 w-4" />
+            Offre disponible
+          </label>
+
+          <div class="mt-2 flex justify-end gap-2 md:col-span-2">
+            <button
+              type="button"
+              (click)="closeModal()"
+              class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</section>
