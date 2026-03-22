@@ -19,7 +19,7 @@ export class ProfileComponent implements OnInit {
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    const userId = 1; // Testing with user ID 1
+    const userId = 3; // Testing with user ID 1
     this.userService.getUser(userId).subscribe({
       next: (data) => {
         this.user = data;
@@ -34,15 +34,7 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteAccount(): void {
-    if (confirm('Are you sure you want to delete your account?')) {
-      this.userService.deleteUser(this.user.id).subscribe({
-        next: () => {
-          alert('Account deleted successfully');
-          this.router.navigate(['/login']);
-        },
-        error: (err) => console.error('Error deleting user:', err)
-      });
-    }
+    this.router.navigate(['/delete-account']);
   }
 
   downloadResume(): void {

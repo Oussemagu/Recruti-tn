@@ -1,0 +1,33 @@
+<div class="confirm-container">
+  <div class="confirm-card">
+    <div class="card-header warning">
+      <h1>Confirm Account Deletion</h1>
+      <p class="subtitle">This action cannot be undone</p>
+    </div>
+
+    <div class="card-body">
+      <div class="warning-box">
+        <p class="warning-title">Are you sure?</p>
+        <p class="warning-text">Deleting your account will permanently:</p>
+        <ul class="warning-list">
+          <li>Remove all your personal information</li>
+          <li>Delete your profile and job applications</li>
+          <li>Cancel your recruiter account access</li>
+          <li>Make this action irreversible</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button 
+        (click)="confirmDelete()" 
+        [disabled]="isLoading" 
+        class="btn btn-danger"
+      >
+        <span *ngIf="!isLoading">Delete my account</span>
+        <span *ngIf="isLoading">Deleting...</span>
+      </button>
+      <button (click)="cancel()" class="btn btn-secondary">Keep my account</button>
+    </div>
+  </div>
+</div>
