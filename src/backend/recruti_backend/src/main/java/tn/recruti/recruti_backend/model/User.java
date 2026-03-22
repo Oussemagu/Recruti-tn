@@ -53,10 +53,7 @@ public class User {
 
     private String nomSociete;
 
-    @NotNull
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] cvGenerique;
+
 
     @OneToMany(mappedBy ="recruteur", fetch=FetchType.LAZY)
     @JsonManagedReference("1")
