@@ -8,17 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tn.recruti.recruti_backend.enums.Role;
-import tn.recruti.recruti_backend.enums.statuAnalyse;
+import tn.recruti.recruti_backend.enums.statuAnalyse;  
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="candidatures")
+@Table(name = "candidatures")
 public class Candidature {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,33 +27,21 @@ public class Candidature {
     private LocalDate datePostulation;
 
     @NotNull
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] Cv;
+    @Column(name = "cv_path")
+    private String cvPath; // chemin vers le fichier PDF
 
     private int scoreCv;
 
-
     @NotNull
     @Enumerated(EnumType.STRING)
-    private statuAnalyse status;
+   private statuAnalyse status;// commence par majuscule par convention
 
     @ManyToOne
-    @JoinColumn(name="candidat_id")
+    @JoinColumn(name = "candidat_id")
     private User candidat;
 
     @ManyToOne
-    @JoinColumn(name="id_offre")
+    @JoinColumn(name = "id_offre")
     @JsonBackReference
     private Offer offre;
-
-
-
-
-
-
-
-
-
-
 }

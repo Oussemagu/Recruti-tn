@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class OfferController {
 
     private final OfferService offerService;

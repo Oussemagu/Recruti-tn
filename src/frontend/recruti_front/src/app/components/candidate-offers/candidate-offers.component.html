@@ -1,93 +1,337 @@
-<section class="mx-auto max-w-7xl p-6">
-  <div class="mb-6 rounded-xl bg-white p-4 shadow">
-    <h1 class="mb-4 text-xl font-semibold text-slate-900">Offres disponibles</h1>
+<!-- candidate-offers.component.html -->
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Offres Disponibles</h1>
+      <p class="page-subtitle">Découvrez et postulez aux opportunités qui vous correspondent</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ offers.length }}</span>
+        <span class="stat-label">Offres disponibles</span>
+      </div>
+      <div class="stat-card stat-card-accent">
+        <span class="stat-number">{{ candidatures.length }}</span>
+        <span class="stat-label">Mes candidatures</span>
+      </div>
+    </div>
+  </div>
 
-    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-3 md:grid-cols-4">
-      <div class="md:col-span-2">
-        <label class="mb-1 block text-sm font-medium text-slate-700">Recherche par titre</label>
+  <!-- Filtres -->
+  <form [formGroup]="filterForm" class="filter-section">
+    <div class="filter-inputs">
+      <div class="input-group">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+        </svg>
         <input
           type="text"
           formControlName="titre"
-          placeholder="Ex: Développeur Frontend"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+          placeholder="Rechercher par titre..."
+          class="filter-input"
         />
       </div>
-
-      <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">Date début</label>
+      <div class="input-group">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+        </svg>
         <input
           type="date"
           formControlName="dateDebut"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+          class="filter-input"
         />
       </div>
-
-      <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">Date fin</label>
+      <div class="input-group">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+        </svg>
         <input
           type="date"
           formControlName="dateFin"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+          class="filter-input"
         />
       </div>
+    </div>
+    <div class="filter-buttons">
+      <button type="button" (click)="applyFilters()" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M3 2a1 1 0 000 2h10a1 1 0 100-2H3zM4 7a1 1 0 011-1h6a1 1 0 110 2H5a1 1 0 01-1-1zm2 4a1 1 0 100 2h4a1 1 0 100-2H6z"/>
+        </svg>
+        Filtrer
+      </button>
+      <button type="button" (click)="resetFilters()" class="btn btn-outline">
+        Réinitialiser
+      </button>
+    </div>
+  </form>
 
-      <div class="md:col-span-4 flex flex-wrap gap-2">
-        <button
-          type="submit"
-          class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
-          Filtrer
-        </button>
-        <button
-          type="button"
-          (click)="resetFilters()"
-          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Réinitialiser
-        </button>
-      </div>
-    </form>
+  <!-- Messages -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <span>Chargement des offres...</span>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+    </svg>
+    {{ errorMessage }}
   </div>
 
-  @if (errorMessage) {
-    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-      {{ errorMessage }}
-    </div>
-  }
-
-  @if (isLoading) {
-    <div class="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-      Chargement en cours...
-    </div>
-  } @else {
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      @for (offer of offers; track offer.id) {
-        <article class="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div class="mb-3 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-slate-900">{{ offer.titre }}</h2>
-            <span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">Disponible</span>
-          </div>
-
-          <p class="mb-4 flex-1 text-sm text-slate-700">{{ offer.description }}</p>
-
-          <div class="mb-4 space-y-1 text-sm text-slate-600">
-            <p><span class="font-medium">Tags:</span> {{ offer.tags || 'N/A' }}</p>
-            <p><span class="font-medium">Date d'émission:</span> {{ offer.dateEmission }}</p>
-          </div>
-
-          <button
-            type="button"
-            (click)="postuler(offer)"
-            class="mt-auto rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-          >
-            Postuler
-          </button>
-        </article>
-      } @empty {
-        <div class="col-span-full rounded-md border border-slate-200 bg-white p-8 text-center text-slate-500">
-          Aucune offre disponible trouvée.
+  <!-- Liste des offres -->
+  <div class="offers-grid" *ngIf="!isLoading">
+    <div *ngFor="let offer of offers" class="offer-card">
+      <div class="offer-header">
+        <div class="offer-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+          </svg>
         </div>
-      }
+        <div class="offer-title-section">
+          <h3 class="offer-title">{{ offer.titre }}</h3>
+          <span class="offer-badge" [class.applied]="offer.id && hasApplied(offer.id)">
+            <span class="badge-dot"></span>
+            {{ offer.id && hasApplied(offer.id) ? 'Candidature envoyée' : 'Nouveau' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="offer-body">
+        <p class="offer-description">{{ offer.description }}</p>
+        <div class="offer-meta">
+          <div class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5.5 2A1.5 1.5 0 004 3.5v9A1.5 1.5 0 005.5 14h5a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 2h-5zM5 4.5a.5.5 0 01.5-.5h5a.5.5 0 01.5.5V6H5V4.5zM5 7h6v1H5V7zm0 2h6v1H5V9z"/>
+            </svg>
+            <span>{{ offer.dateEmission | date: 'dd MMM yyyy' }}</span>
+          </div>
+          <div class="meta-item" *ngIf="offer.tags">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 4a2 2 0 012-2h4.586A2 2 0 0110 2.586L13.414 6A2 2 0 0114 7.414V12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2-1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V7.414a1 1 0 00-.293-.707L10.293 3.293A1 1 0 009.586 3H4z"/>
+            </svg>
+            <span>{{ offer.tags }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="offer-footer">
+        <ng-container *ngIf="offer.id && hasApplied(offer.id); else notApplied">
+          <button
+            (click)="consulterCandidature(offer.id!)"
+            class="btn btn-secondary btn-sm"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 3.5C4.5 3.5 1.5 6 0 8c1.5 2 4.5 4.5 8 4.5s6.5-2.5 8-4.5c-1.5-2-4.5-4.5-8-4.5zM8 11c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3zm0-4.5c-0.8 0-1.5 0.7-1.5 1.5s0.7 1.5 1.5 1.5 1.5-0.7 1.5-1.5-0.7-1.5-1.5-1.5z"/>
+            </svg>
+            Voir détails
+          </button>
+          <button
+            (click)="supprimerCandidature(offer.id!)"
+            class="btn btn-danger btn-sm"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5.5 1a1 1 0 00-1 1v1H2v1h1v9a2 2 0 002 2h6a2 2 0 002-2V4h1V3h-2.5V2a1 1 0 00-1-1h-5zM6 2h4v1H6V2zm-1 3h6v8H5V5z"/>
+            </svg>
+            Retirer
+          </button>
+        </ng-container>
+
+        <ng-template #notApplied>
+          <button
+            (click)="ouvrirModal(offer)"
+            class="btn btn-primary btn-full"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 2a.5.5 0 01.5.5v5h5a.5.5 0 010 1h-5v5a.5.5 0 01-1 0v-5h-5a.5.5 0 010-1h5v-5A.5.5 0 018 2z"/>
+            </svg>
+            Postuler maintenant
+          </button>
+        </ng-template>
+      </div>
     </div>
-  }
-</section>
+  </div>
+
+  <!-- Message si aucune offre -->
+  <div *ngIf="!isLoading && offers.length === 0" class="empty-state">
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="currentColor">
+      <path d="M32 8C18.745 8 8 18.745 8 32s10.745 24 24 24 24-10.745 24-24S45.255 8 32 8zm0 44c-11.028 0-20-8.972-20-20s8.972-20 20-20 20 8.972 20 20-8.972 20-20 20z"/>
+      <path d="M28 24h8v4h-8zm0 8h8v12h-8z"/>
+    </svg>
+    <h3>Aucune offre disponible</h3>
+    <p>Il n'y a pas d'offres correspondant à vos critères pour le moment.</p>
+  </div>
+</div>
+
+<!-- Modal de postulation -->
+<div *ngIf="showModal" class="modal-overlay" (click)="fermerModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Postuler à l'offre</h3>
+      <button (click)="fermerModal()" class="btn-close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="offer-summary">
+        <h4>{{ selectedOffer?.titre }}</h4>
+        <p>{{ selectedOffer?.description }}</p>
+      </div>
+
+      <div class="file-upload-zone">
+        <label for="cv-upload" class="file-upload-label">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M16 4C9.373 4 4 9.373 4 16s5.373 12 12 12 12-5.373 12-12S22.627 4 16 4zm0 22c-5.514 0-10-4.486-10-10S10.486 6 16 6s10 4.486 10 10-4.486 10-10 10z"/>
+            <path d="M16 10v8m0 0v0m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="file-upload-text">
+            <strong>Cliquez pour télécharger</strong> votre CV (PDF uniquement)
+          </span>
+        </label>
+        <input
+          id="cv-upload"
+          type="file"
+          accept=".pdf"
+          (change)="onFileChange($event)"
+          class="file-input-hidden"
+        />
+        <div *ngIf="selectedFile" class="file-selected">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M9 0H4a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V5l-5-5zM8 5V1l4 4H8z"/>
+          </svg>
+          <span>{{ selectedFile.name }}</span>
+          <span class="file-size">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+        </div>
+      </div>
+
+      <div *ngIf="submitSuccess" class="alert alert-success">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+        </svg>
+        {{ submitSuccess }}
+      </div>
+      <div *ngIf="submitError" class="alert alert-error">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+        </svg>
+        {{ submitError }}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="fermerModal()" class="btn btn-outline">
+        Annuler
+      </button>
+      <button
+        (click)="soumettreCandidature()"
+        [disabled]="!selectedFile || isSubmitting"
+        class="btn btn-primary"
+      >
+        <svg *ngIf="!isSubmitting" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M15.854 7.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L14.293 8 12.146 5.854a.5.5 0 11.708-.708l3 3z"/>
+          <path fill-rule="evenodd" d="M.5 8a.5.5 0 01.5-.5h13a.5.5 0 010 1H1A.5.5 0 01.5 8z"/>
+        </svg>
+        <span *ngIf="!isSubmitting">Envoyer ma candidature</span>
+        <span *ngIf="isSubmitting">Envoi en cours...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de consultation candidature -->
+<div *ngIf="showDetailsModal" class="modal-overlay" (click)="fermerDetailsModal()">
+  <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Détails de ma candidature</h3>
+      <button (click)="fermerDetailsModal()" class="btn-close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedCandidature">
+      <div class="candidature-info-grid">
+        <div class="info-card">
+          <div class="info-icon info-icon-blue">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+            </svg>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Date de postulation</span>
+            <span class="info-value">{{ selectedCandidature.datePostulation | date: 'dd MMMM yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon info-icon-green">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+            </svg>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Statut</span>
+            <span class="info-value">
+              <span [class]="'status-badge ' + getStatusClass(selectedCandidature.status)">
+                {{ getStatusLabel(selectedCandidature.status) }}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon info-icon-purple">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+            </svg>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Score CV</span>
+            <span class="info-value">{{ selectedCandidature.scoreCv }}%</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon info-icon-orange">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z"/>
+              <path d="M3 8a2 2 0 012-2v10h8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="cv-viewer-section">
+        <div class="section-header">
+          <h4>Aperçu du CV</h4>
+          <a [href]="candidatureService.getCvUrl(selectedCandidature.cvPath)"
+             target="_blank"
+             class="btn btn-outline btn-sm">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8.636 3.5a.5.5 0 00-.5-.5H1.5A1.5 1.5 0 000 4.5v10A1.5 1.5 0 001.5 16h10a1.5 1.5 0 001.5-1.5V7.864a.5.5 0 00-1 0V14.5a.5.5 0 01-.5.5h-10a.5.5 0 01-.5-.5v-10a.5.5 0 01.5-.5h6.636a.5.5 0 00.5-.5z"/>
+              <path d="M16 .5a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h3.793L6.146 9.146a.5.5 0 10.708.708L15 1.707V5.5a.5.5 0 001 0v-5z"/>
+            </svg>
+            Ouvrir dans un nouvel onglet
+          </a>
+        </div>
+        <div class="cv-viewer">
+          <iframe
+            *ngIf="cvUrl"
+            [src]="cvUrl"
+            class="cv-iframe"
+            frameborder="0">
+          </iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="fermerDetailsModal()" class="btn btn-outline">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
