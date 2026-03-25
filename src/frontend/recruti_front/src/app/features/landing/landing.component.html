@@ -1,0 +1,85 @@
+<div class="landing">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <span class="nav-logo">✦ Recruiti</span>
+    <div class="nav-actions">
+      <a routerLink="/auth/login" class="nav-link">Sign In</a>
+      <a routerLink="/auth/register" class="nav-btn">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🚀 The Future of Hiring</div>
+    <h1 class="hero-title">
+      Where <em>talent</em> meets<br>opportunity
+    </h1>
+    <p class="hero-sub">Connect, discover, and build the future of work.</p>
+    <div class="hero-cta">
+      <a routerLink="/auth/register" class="btn-primary">Start Hiring</a>
+      <a routerLink="/auth/login" class="btn-ghost">Find a Job</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">12k+</span><span class="stat-label">Companies</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">85k+</span><span class="stat-label">Candidates</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Match Rate</span></div>
+    </div>
+  </section>
+
+  <!-- ROLE CARDS -->
+  <section class="roles">
+    <div class="role-card role-recruiter" (click)="goRegister()" routerLink="/auth/register">
+      <div class="role-icon">💼</div>
+      <h2>I'm a Recruiter</h2>
+      <p>Post jobs, manage applications, and find top talent with powerful analytics and insights.</p>
+      <ul class="role-list">
+        <li>Create and manage job postings</li>
+        <li>Review candidate profiles</li>
+        <li>Advanced analytics dashboard</li>
+      </ul>
+      <span class="role-cta">Get Started →</span>
+      <div class="role-bg-shape"></div>
+    </div>
+
+    <div class="role-card role-seeker" routerLink="/auth/login" [queryParams]="{role:'jobseeker'}">
+      <div class="role-icon role-icon-blue">🎓</div>
+      <h2>I'm a Job Seeker</h2>
+      <p>Build your profile, discover opportunities, and land your dream job with smart recommendations.</p>
+      <ul class="role-list">
+        <li>Create professional profile</li>
+        <li>Browse and apply to jobs</li>
+        <li>Smart job recommendations</li>
+      </ul>
+      <span class="role-cta role-cta-blue">Get Started →</span>
+      <div class="role-bg-shape role-bg-blue"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feature-card">
+      <span class="feat-icon">🎯</span>
+      <h3>Smart Matching</h3>
+      <p>AI-powered recommendations connect the right talent with the right opportunities.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">📊</span>
+      <h3>Data-Driven</h3>
+      <p>Comprehensive analytics and insights to make informed hiring decisions.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">⚡</span>
+      <h3>Lightning Fast</h3>
+      <p>Streamlined workflow from application to hire in record time.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>© 2025 Recruiti · Built with care</span>
+  </footer>
+
+</div>

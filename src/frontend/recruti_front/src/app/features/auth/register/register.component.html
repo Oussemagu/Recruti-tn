@@ -1,0 +1,257 @@
+<div class="auth-page">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="left-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark">✦</span>
+        <span class="brand-name">Recruiti</span>
+      </a>
+
+      <div class="left-body">
+        <div class="left-heading">
+          <h2 class="left-title">Join<br><em>12,000+</em><br>professionals</h2>
+          <span class="quote-line"></span>
+        </div>
+
+        <div class="left-features">
+          <div class="feat">
+            <span class="feat-icon"></span>
+            <div>
+              <strong>Smart Matching</strong>
+              <p>AI connects the right profiles to the right opportunities</p>
+            </div>
+          </div>
+          <div class="feat">
+            <span class="feat-icon"></span>
+            <div>
+              <strong>Lightning Fast</strong>
+              <p>From application to hire in record time</p>
+            </div>
+          </div>
+          <div class="feat">
+            <span class="feat-icon"></span>
+            <div>
+              <strong>Analytics</strong>
+              <p>Comprehensive dashboards to make quick decisions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="geo geo-1"></div>
+      <div class="geo geo-2"></div>
+      <div class="geo geo-3"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="form-wrapper">
+
+      <div class="form-head">
+        <h1 class="form-title">Create an account<span class="dot">.</span></h1>
+        <p class="form-sub">Join Recruiti in just a few seconds</p>
+      </div>
+
+      <!-- Progress steps -->
+      <div class="progress-steps">
+        <div class="step" [class.active]="step >= 1" [class.done]="step > 1">
+          <span class="step-num">{{ step > 1 ? '✓' : '1' }}</span>
+          <span class="step-label">Identity</span>
+        </div>
+        <div class="step-line" [class.active]="step > 1"></div>
+        <div class="step" [class.active]="step >= 2" [class.done]="step > 2">
+          <span class="step-num">{{ step > 2 ? '✓' : '2' }}</span>
+          <span class="step-label">Profile</span>
+        </div>
+        <div class="step-line" [class.active]="step > 2"></div>
+        <div class="step" [class.active]="step >= 3">
+          <span class="step-num">3</span>
+          <span class="step-label">Details</span>
+        </div>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #f="ngForm" class="auth-form" autocomplete="off">
+
+        <!-- STEP 1 — Identity -->
+        <div class="form-step" *ngIf="step === 1">
+
+          <div class="field-row">
+            <div class="field">
+              <input id="nom" type="text" placeholder=" "
+                     [(ngModel)]="form.nom" name="nom" required #nom="ngModel"
+                     [class.error-input]="nom.invalid && nom.touched">
+              <label for="nom">Last Name</label>
+              <span class="field-bar"></span>
+              <span class="field-error" *ngIf="nom.invalid && nom.touched">Required</span>
+            </div>
+            <div class="field">
+              <input id="prenom" type="text" placeholder=" "
+                     [(ngModel)]="form.prenom" name="prenom" required #prenom="ngModel"
+                     [class.error-input]="prenom.invalid && prenom.touched">
+              <label for="prenom">First Name</label>
+              <span class="field-bar"></span>
+              <span class="field-error" *ngIf="prenom.invalid && prenom.touched">Required</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <input id="email" type="email" placeholder=" "
+                   [(ngModel)]="form.email" name="email" required email #email="ngModel"
+                   [class.error-input]="email.invalid && email.touched">
+            <label for="email">Email address</label>
+            <span class="field-icon">✉</span>
+            <span class="field-bar"></span>
+            <span class="field-error" *ngIf="email.invalid && email.touched">Valid email required</span>
+          </div>
+
+          <div class="field">
+            <input id="password" [type]="showPw ? 'text' : 'password'" placeholder=" "
+                   [(ngModel)]="form.password" name="password" required minlength="8" #password="ngModel"
+                   [class.error-input]="password.invalid && password.touched">
+            <label for="password">Password</label>
+            <span class="field-icon-left"></span>
+            <button type="button" class="pw-eye" (click)="showPw = !showPw">
+              {{ showPw ? '🙈' : '👁' }}
+            </button>
+            <span class="field-bar"></span>
+            <span class="field-error" *ngIf="password.invalid && password.touched">Min 8 characters</span>
+          </div>
+
+          <button type="button" class="btn-next"
+                  [disabled]="!form.nom || !form.prenom || !form.email || !form.password"
+                  (click)="nextStep()">
+            Next
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- STEP 2 — Profile -->
+        <div class="form-step" *ngIf="step === 2">
+
+          <!-- ROLE -->
+          <div class="field select-field">
+            <select id="role" [(ngModel)]="form.role" name="role" required>
+              <option value="" disabled>Select role</option>
+              <option value="RECRUTEUR">💼 Recruiter</option>
+              <option value="CANDIDAT">🎓 Candidate</option>
+            </select>
+            <label for="role">Role</label>
+            <span class="select-caret">▾</span>
+            <span class="field-bar"></span>
+          </div>
+
+          <!-- DATE OF BIRTH -->
+          <div class="field">
+            <input id="dateNaissance" type="date" placeholder=" "
+                   [(ngModel)]="form.dateNaissance" name="dateNaissance" required #dob="ngModel"
+                   [class.error-input]="dob.invalid && dob.touched">
+            <label for="dateNaissance" class="label-top">Date of birth</label>
+            <span class="field-bar"></span>
+            <span class="field-error" *ngIf="dob.invalid && dob.touched">Required</span>
+          </div>
+
+          <!-- GENDER + GOVERNORATE -->
+          <div class="field-row">
+
+            <!-- GENDER -->
+            <div class="field select-field">
+              <select id="sexe" [(ngModel)]="form.sexe" name="sexe">
+                <option value="" disabled>Select</option>
+                <option value="Homme"> Male</option>
+                <option value="Femme"> Female</option>
+              </select>
+              <label for="sexe">Gender</label>
+              <span class="select-caret">▾</span>
+              <span class="field-bar"></span>
+            </div>
+
+            <!-- GOVERNORATE -->
+            <div class="field select-field">
+              <select id="gouvernorat" [(ngModel)]="form.gouvernorat" name="gouvernorat">
+                <option value="" disabled>Select</option>
+                <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
+              </select>
+              <label for="gouvernorat">Governorate</label>
+              <span class="select-caret">▾</span>
+              <span class="field-bar"></span>
+            </div>
+
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-back" (click)="prevStep()">← Back</button>
+            <button type="button" class="btn-next"
+                    [disabled]="!form.role || !form.dateNaissance"
+                    (click)="nextStep()">
+              Next
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- STEP 3 — Details -->
+        <div class="form-step" *ngIf="step === 3">
+
+          <div class="field-row">
+            <div class="field">
+              <input id="nomSociete" type="text" placeholder=" "
+                     [(ngModel)]="form.nomSociete" name="nomSociete">
+              <label for="nomSociete">Company</label>
+              <span class="field-bar"></span>
+            </div>
+            <div class="field">
+              <input id="poste" type="text" placeholder=" "
+                     [(ngModel)]="form.poste" name="poste">
+              <label for="poste">Position</label>
+              <span class="field-bar"></span>
+            </div>
+          </div>
+          <!--
+          <div class="field">
+            <input id="skills" type="text" placeholder=" "
+                   [(ngModel)]="form.skills" name="skills">
+            <label for="skills">Skills (e.g. Java, Angular…)</label>
+            <span class="field-icon">🛠</span>
+            <span class="field-bar"></span>
+          </div>
+        -->
+          <div class="error-banner" *ngIf="error">
+            <span>⚠</span> {{ error }}
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-back" (click)="prevStep()">← Back</button>
+            <button type="submit" class="btn-submit" [disabled]="loading">
+              <span class="btn-text" *ngIf="!loading">
+                Create account
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <span class="btn-loader" *ngIf="loading">
+                <span></span><span></span><span></span>
+              </span>
+            </button>
+          </div>
+
+        </div>
+
+      </form>
+
+      <div class="form-footer">
+        <span>Already have an account?</span>
+        <a routerLink="/auth/login">Sign in</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
