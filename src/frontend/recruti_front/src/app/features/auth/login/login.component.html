@@ -1,0 +1,125 @@
+<div class="auth-page">
+
+  <!-- LEFT PANEL — visual identity -->
+  <div class="auth-left">
+    <div class="left-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark">✦</span>
+        <span class="brand-name">Recruiti</span>
+      </a>
+
+      <div class="left-body">
+        <div class="left-quote">
+          <p class="quote-text">"The best hire<br>starts with the<br>best connection."</p>
+          <span class="quote-line"></span>
+        </div>
+
+        <div class="left-stats">
+          <div class="stat-item">
+            <span class="stat-n">12k+</span>
+            <span class="stat-l">Companies</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-n">85k+</span>
+            <span class="stat-l">Candidates</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-n">98%</span>
+            <span class="stat-l">Satisfaction</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geometric decoration -->
+      <div class="geo geo-1"></div>
+      <div class="geo geo-2"></div>
+      <div class="geo geo-3"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL — form -->
+  <div class="auth-right">
+    <div class="form-wrapper">
+
+      <!-- Role toggle -->
+      <div class="role-toggle">
+        <button [class.active]="role === 'recruiter'" (click)="role = 'recruiter'" type="button">
+          <span class="toggle-icon">💼</span> Recruiter
+        </button>
+        <button [class.active]="role === 'jobseeker'" (click)="role = 'jobseeker'" type="button">
+          <span class="toggle-icon">🎓</span> Candidate
+        </button>
+        <div class="toggle-pill" [class.right]="role === 'jobseeker'"></div>
+      </div>
+
+      <div class="form-head">
+        <h1 class="form-title">Welcome back<span class="dot">.</span></h1>
+        <p class="form-sub">Sign in to continue</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #f="ngForm" class="auth-form" autocomplete="off">
+
+        <div class="field" [class.filled]="form.email">
+          <input id="email" type="email" placeholder=" "
+                 [(ngModel)]="form.email" name="email"
+                 required email #email="ngModel"
+                 [class.error-input]="email.invalid && email.touched">
+          <label for="email">Email address</label>
+          <span class="field-icon">✉</span>
+          <span class="field-bar"></span>
+          <span class="field-error" *ngIf="email.invalid && email.touched">
+            Valid email required
+          </span>
+        </div>
+
+        <div class="field" [class.filled]="form.password">
+          <input id="password" [type]="showPw ? 'text' : 'password'" placeholder=" "
+                 [(ngModel)]="form.password" name="password"
+                 required #password="ngModel"
+                 [class.error-input]="password.invalid && password.touched">
+          <label for="password">Password</label>
+          <span class="field-icon">🔒</span>
+          <button type="button" class="pw-eye" (click)="showPw = !showPw"
+                  [attr.aria-label]="showPw ? 'Hide' : 'Show'">
+            {{ showPw ? '🙈' : '👁' }}
+          </button>
+          <span class="field-bar"></span>
+          <span class="field-error" *ngIf="password.invalid && password.touched">
+            Required
+          </span>
+        </div>
+
+        <div class="form-meta">
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <div class="error-banner" *ngIf="error">
+          <span>⚠</span> {{ error }}
+        </div>
+
+        <button type="submit" class="btn-submit"
+                [class.recruiter]="role === 'recruiter'"
+                [class.candidate]="role === 'jobseeker'"
+                [disabled]="f.invalid || loading">
+          <span class="btn-text" *ngIf="!loading">
+            Sign in
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="btn-loader" *ngIf="loading">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+
+      </form>
+
+      <div class="form-footer">
+        <span>Don't have an account?</span>
+        <a routerLink="/auth/register">Create an account</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
