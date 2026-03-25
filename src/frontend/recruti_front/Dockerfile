@@ -2,21 +2,29 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
+# Copier les fichiers de dépendances
 COPY package*.json ./
-RUN npm ci
+
+# Installer les dépendances
+RUN npm ci --legacy-peer-deps
+
+# Copier tout le code source
 COPY . .
 
-RUN npm run build -- --configuration production
+# Build Angular - CORRECTION ICI : pas de flag --production
+RUN npm run build
 
+# Stage de production avec Nginx
 FROM nginx:alpine
 
-# ✅ Supprimer la config par défaut de nginx
+# Supprimer la config par défaut
 RUN rm /etc/nginx/conf.d/default.conf
 
-# ✅ Copier votre config
+# Copier la config Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/dist/recruti_front/browser/. /usr/share/nginx/html/
+# IMPORTANT : Avec Angular 17+, les fichiers sont dans browser/
+COPY --from=build /app/dist/recruti_front/browser /usr/share/nginx/html/
 
 EXPOSE 80
 

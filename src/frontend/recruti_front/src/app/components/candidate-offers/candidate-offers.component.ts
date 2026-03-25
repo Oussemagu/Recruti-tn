@@ -21,11 +21,11 @@ export class CandidateOffersComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
 
   offers: Offer[] = [];
-  candidatures: Candidature[] = [];
+  applications: Candidature[] = [];  // Keep as 'applications' for the template
   isLoading = false;
   errorMessage = '';
 
-  // Modal de postulation
+  // Application modal
   showModal = false;
   selectedOffer: Offer | null = null;
   selectedFile: File | null = null;
@@ -33,27 +33,27 @@ export class CandidateOffersComponent implements OnInit {
   submitSuccess = '';
   submitError = '';
 
-  // Modal de consultation
+  // Details modal
   showDetailsModal = false;
-  selectedCandidature: Candidature | null = null;
+  selectedApplication: Candidature | null = null;  // Keep as 'selectedApplication' for the template
   cvUrl: SafeResourceUrl | null = null;
 
   readonly filterForm = this.fb.group({
-    titre: [''],
-    dateDebut: [''],
-    dateFin: ['']
+    title: [''],           // Changed from 'titre'
+    startDate: [''],       // Changed from 'dateDebut'
+    endDate: ['']          // Changed from 'dateFin'
   });
 
   constructor(
     private readonly offerService: OfferService,
-    public readonly candidatureService: CandidatureService  // ✅ Changé de private à public
+    public readonly applicationService: CandidatureService  // Keep as 'applicationService' for the template
   ) {}
 
   ngOnInit(): void {
     this.loadData();
   }
 
-  private getCandidatId(): number {
+  private getCandidateId(): number {  // Changed from getCandidatId
     const stored = localStorage.getItem('userId');
     const parsed = Number(stored);
     return stored && !isNaN(parsed) ? parsed : 1;
@@ -62,38 +62,38 @@ export class CandidateOffersComponent implements OnInit {
   loadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    const candidatId = this.getCandidatId();
+    const candidateId = this.getCandidateId();
 
     forkJoin({
       offers: this.offerService.filterByAvailable(true),
-      candidatures: this.candidatureService.getCandidaturesByCandidat(candidatId)
+      applications: this.applicationService.getCandidaturesByCandidat(candidateId)
     }).subscribe({
       next: (result) => {
         this.offers = result.offers;
-        this.candidatures = result.candidatures;
+        this.applications = result.applications;
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Erreur lors du chargement des données.';
+        this.errorMessage = 'Error loading data.';
         this.isLoading = false;
       }
     });
   }
 
   hasApplied(offerId: number): boolean {
-    return this.candidatures.some(c => c.idOffre === offerId);
+    return this.applications.some(c => c.idOffre === offerId);
   }
 
-  getCandidature(offerId: number): Candidature | undefined {
-    return this.candidatures.find(c => c.idOffre === offerId);
+  getApplication(offerId: number): Candidature | undefined {  // Changed from getCandidature
+    return this.applications.find(c => c.idOffre === offerId);
   }
 
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
-      'INITIAL': 'En attente',
-      'EN_COURS': 'En cours',
-      'ACCEPTE': 'Accepté',
-      'REFUSE': 'Refusé'
+      'INITIAL': 'Pending',         // Changed from 'En attente'
+      'EN_COURS': 'In progress',    // Changed from 'En cours'
+      'ACCEPTE': 'Accepted',        // Changed from 'Accepté'
+      'REFUSE': 'Rejected'          // Changed from 'Refusé'
     };
     return statusMap[status] || status;
   }
@@ -113,28 +113,28 @@ export class CandidateOffersComponent implements OnInit {
   }
 
   applyFilters(): void {
-    const titre = (this.filterForm.value.titre ?? '').trim();
-    const dateDebut = this.filterForm.value.dateDebut ?? '';
-    const dateFin = this.filterForm.value.dateFin ?? '';
+    const title = (this.filterForm.value.title ?? '').trim();
+    const startDate = this.filterForm.value.startDate ?? '';
+    const endDate = this.filterForm.value.endDate ?? '';
     this.isLoading = true;
     this.errorMessage = '';
 
-    if (dateDebut && dateFin) {
-      this.offerService.filterByDateRange(dateDebut, dateFin).subscribe({
+    if (startDate && endDate) {
+      this.offerService.filterByDateRange(startDate, endDate).subscribe({
         next: (data) => {
           const available = data.filter(o => o.available);
-          this.offers = titre ? available.filter(o => o.titre.toLowerCase().includes(titre.toLowerCase())) : available;
+          this.offers = title ? available.filter(o => o.titre.toLowerCase().includes(title.toLowerCase())) : available;
           this.isLoading = false;
         },
-        error: () => { this.errorMessage = 'Erreur lors du filtrage.'; this.isLoading = false; }
+        error: () => { this.errorMessage = 'Error applying filters.'; this.isLoading = false; }
       });
       return;
     }
 
-    if (titre) {
-      this.offerService.searchByTitre(titre).subscribe({
+    if (title) {
+      this.offerService.searchByTitre(title).subscribe({
         next: (data) => { this.offers = data.filter(o => o.available); this.isLoading = false; },
-        error: () => { this.errorMessage = 'Erreur lors de la recherche.'; this.isLoading = false; }
+        error: () => { this.errorMessage = 'Error during search.'; this.isLoading = false; }
       });
       return;
     }
@@ -143,11 +143,11 @@ export class CandidateOffersComponent implements OnInit {
   }
 
   resetFilters(): void {
-    this.filterForm.reset({ titre: '', dateDebut: '', dateFin: '' });
+    this.filterForm.reset({ title: '', startDate: '', endDate: '' });
     this.loadAvailableOffers();
   }
 
-  ouvrirModal(offer: Offer): void {
+  openModal(offer: Offer): void {  // Changed from ouvrirModal
     this.selectedOffer = offer;
     this.selectedFile = null;
     this.submitSuccess = '';
@@ -155,7 +155,7 @@ export class CandidateOffersComponent implements OnInit {
     this.showModal = true;
   }
 
-  fermerModal(): void {
+  closeModal(): void {  // Changed from fermerModal
     this.showModal = false;
     this.selectedOffer = null;
     this.selectedFile = null;
@@ -168,14 +168,14 @@ export class CandidateOffersComponent implements OnInit {
     }
   }
 
-  soumettreCandidature(): void {
+  submitApplication(): void {  // Changed from soumettreCandidature
     if (!this.selectedFile || !this.selectedOffer || !this.selectedOffer.id) return;
 
-    const candidatId = this.getCandidatId();
-    const offreId = Number(this.selectedOffer.id);
+    const candidateId = this.getCandidateId();
+    const offerId = Number(this.selectedOffer.id);
 
-    if (isNaN(offreId)) {
-      this.submitError = 'ID offre invalide.';
+    if (isNaN(offerId)) {
+      this.submitError = 'Invalid offer ID.';
       return;
     }
 
@@ -183,52 +183,52 @@ export class CandidateOffersComponent implements OnInit {
     this.submitError = '';
     this.submitSuccess = '';
 
-    this.candidatureService.postuler(candidatId, offreId, this.selectedFile).subscribe({
+    this.applicationService.postuler(candidateId, offerId, this.selectedFile).subscribe({
       next: (msg) => {
         this.submitSuccess = msg;
         this.isSubmitting = false;
         setTimeout(() => {
-          this.fermerModal();
+          this.closeModal();
           this.loadData();
         }, 1500);
       },
       error: (err) => {
-        this.submitError = err.error || 'Erreur lors de la candidature.';
+        this.submitError = err.error || 'Error submitting application.';
         this.isSubmitting = false;
       }
     });
   }
 
-  consulterCandidature(offerId: number): void {
-    const candidature = this.getCandidature(offerId);
-    if (!candidature) return;
+  viewApplication(offerId: number): void {  // Changed from consulterCandidature
+    const application = this.getApplication(offerId);
+    if (!application) return;
 
-    this.selectedCandidature = candidature;
+    this.selectedApplication = application;
 
-    // Construire l'URL du CV
-    const cvUrl = this.candidatureService.getCvUrl(candidature.cvPath);
+    // Build CV URL
+    const cvUrl = this.applicationService.getCvUrl(application.cvPath);
     this.cvUrl = this.sanitizer.bypassSecurityTrustResourceUrl(cvUrl);
 
     this.showDetailsModal = true;
   }
 
-  fermerDetailsModal(): void {
+  closeDetailsModal(): void {  // Changed from fermerDetailsModal
     this.showDetailsModal = false;
-    this.selectedCandidature = null;
+    this.selectedApplication = null;
     this.cvUrl = null;
   }
 
-  supprimerCandidature(offerId: number): void {
-    const candidature = this.getCandidature(offerId);
-    if (!candidature) return;
+  deleteApplication(offerId: number): void {  // Changed from supprimerCandidature
+    const application = this.getApplication(offerId);
+    if (!application) return;
 
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette candidature ?')) {
-      this.candidatureService.deleteCandidature(candidature.idCandidature).subscribe({
+    if (confirm('Are you sure you want to withdraw this application?')) {
+      this.applicationService.deleteCandidature(application.idCandidature).subscribe({
         next: () => {
           this.loadData();
         },
         error: () => {
-          alert('Erreur lors de la suppression de la candidature.');
+          alert('Error withdrawing application.');
         }
       });
     }
