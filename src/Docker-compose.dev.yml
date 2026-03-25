@@ -8,10 +8,15 @@ services:
     container_name: recruti_frontend
     ports:
       - "4200:80"  # Mappe le port 80 du conteneur (Nginx) au port 4200 de votre machine
+    #volumes:
+     # - ./frontend/recruti_front:/app # Monte le dossier du projet dans le conteneur pour le développement en temps réel
+     # - /app/node_modules # Monte le dossier du projet dans le conteneur, mais ignore node_modules pour éviter les conflits
     depends_on:
       - backend  # Le frontend dépend du backend, mais attendre n'est pas critique
     networks:
       - app-network
+    env_file:
+      - ./frontend/recruti_front/.env
     restart: always
 
   mysql:
@@ -49,6 +54,8 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    env_file:
+      - ./backend/recruti_backend/.env
 
 networks:
   app-network:
