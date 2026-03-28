@@ -1,7 +1,7 @@
 package tn.recruti.recruti_backend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import tn.recruti.recruti_backend.Exception.RessourceNotFoundException;
 import tn.recruti.recruti_backend.model.Offer;

@@ -1,0 +1,42 @@
+<div class="modal-overlay" (click)="cancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Verify Your Password</h2>
+    <p class="modal-subtitle">Enter your password to continue</p>
+
+    <div class="form-group">
+      <label for="password">PASSWORD</label>
+      <input
+        id="password"
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Enter your password"
+        class="form-input"
+        (keyup.enter)="verify()"
+        [disabled]="isLoading()"
+      />
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage()">
+      <p>{{ errorMessage() }}</p>
+    </div>
+
+    <div class="modal-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="cancel()"
+        [disabled]="isLoading()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn-danger"
+        (click)="verify()"
+        [disabled]="!password || isLoading()"
+      >
+        {{ isLoading() ? 'Verifying...' : 'Verify' }}
+      </button>
+    </div>
+  </div>
+</div>

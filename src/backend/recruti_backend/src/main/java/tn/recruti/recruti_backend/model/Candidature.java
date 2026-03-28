@@ -1,17 +1,14 @@
 package tn.recruti.recruti_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tn.recruti.recruti_backend.enums.Role;
 import tn.recruti.recruti_backend.enums.statuAnalyse;  
 
 import java.time.LocalDate;
-import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
