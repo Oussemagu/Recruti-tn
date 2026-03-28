@@ -1,8 +1,8 @@
 package tn.recruti.recruti_backend.security;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 /**
  * Configuration centrale de spring Security
  * Définit :
@@ -56,6 +56,8 @@ public class SecurityConfig {
 		.authorizeHttpRequests(auth -> auth
 				//Routes publiques : inscription et connexion accessibles sans token 
 				.requestMatchers("/api/auth/**").permitAll()
+				//Routes utilisateurs nécessitent authentification (l'autho se fait via @PreAuthorize au niveau des endpoints)
+				.requestMatchers("/api/users/**").authenticated()
 				//Routes accessibles aux deux roles authentifies
 				.requestMatchers("/api/offers/**").hasAnyRole("RECRUITER","CANDIDATE")
 				//Routes reservees aux recruteurs uniquement

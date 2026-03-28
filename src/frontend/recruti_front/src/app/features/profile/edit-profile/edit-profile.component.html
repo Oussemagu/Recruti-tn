@@ -1,0 +1,161 @@
+<div class="edit-profile-container">
+  <div class="edit-header">
+    <div>
+      <h1>My Profile</h1>
+      <p class="subtitle">Manage your professional information</p>
+    </div>
+    <button class="btn-primary" (click)="saveChanges()" [disabled]="!profileForm.dirty || isSubmitting()">
+      {{ isSubmitting() ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="saveChanges()">
+    <!-- Personal Information Section -->
+    <div class="profile-section">
+      <div class="section-header">
+        <span class="section-icon">👤</span>
+        <h2>Personal Information</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="prenom">FIRST NAME</label>
+          <input
+            id="prenom"
+            type="text"
+            formControlName="prenom"
+            class="form-input"
+            placeholder="First Name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="nom">LAST NAME</label>
+          <input
+            id="nom"
+            type="text"
+            formControlName="nom"
+            class="form-input"
+            placeholder="Last Name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">EMAIL</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="Email"
+          />
+          <span class="error-message" *ngIf="profileForm.get('email')?.hasError('email') && profileForm.get('email')?.touched">
+            Please enter a valid email
+          </span>
+        </div>
+        <div class="form-group">
+          <label for="dateNaissance">DATE OF BIRTH</label>
+          <input
+            id="dateNaissance"
+            type="date"
+            formControlName="dateNaissance"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label for="sexe">GENDER</label>
+          <select id="sexe" formControlName="sexe" class="form-input">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="gouvernorat">GOVERNORATE</label>
+          <input
+            id="gouvernorat"
+            type="text"
+            formControlName="gouvernorat"
+            class="form-input"
+            placeholder="Governorate"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Information Section -->
+    <div class="profile-section">
+      <div class="section-header">
+        <span class="section-icon">💼</span>
+        <h2>Professional Information</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="poste">POSITION</label>
+          <input
+            id="poste"
+            type="text"
+            formControlName="poste"
+            class="form-input"
+            placeholder="Position"
+          />
+        </div>
+        <div class="form-group">
+          <label for="nomSociete">COMPANY NAME</label>
+          <input
+            id="nomSociete"
+            type="text"
+            formControlName="nomSociete"
+            class="form-input"
+            placeholder="Company Name"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="profile-section">
+      <div class="section-header">
+        <span class="section-icon">📚</span>
+        <h2>Skills</h2>
+      </div>
+      <div class="form-group">
+        <label for="skills">Your Skills</label>
+        <textarea
+          id="skills"
+          formControlName="skills"
+          class="form-input form-textarea"
+          placeholder="List your skills (comma separated or one per line)"
+          rows="4"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Password Change Section -->
+    <div class="profile-section">
+      <div class="section-header">
+        <span class="section-icon">🔒</span>
+        <h2>Security</h2>
+      </div>
+      <div class="form-group">
+        <label for="password">NEW PASSWORD</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="form-input"
+          placeholder="Leave empty to keep current password"
+        />
+        <span class="hint">Leave empty if you don't want to change your password</span>
+      </div>
+    </div>
+  </form>
+
+  <!-- Error Message -->
+  <div class="error-banner" *ngIf="errorMessage()">
+    <p>{{ errorMessage() }}</p>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-banner" *ngIf="successMessage()">
+    <p>{{ successMessage() }}</p>
+  </div>
+</div>

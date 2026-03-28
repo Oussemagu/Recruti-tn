@@ -1,0 +1,122 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div>
+      <h1>My Profile</h1>
+      <p class="subtitle">Manage your professional information</p>
+    </div>
+    <button class="btn-primary" (click)="goToEditProfile()">Edit Profile</button>
+  </div>
+
+  <div class="profile-content" *ngIf="user(); else loading">
+    <!-- Personal Information Section -->
+    <div class="profile-section">
+      <div class="section-header">
+        <span class="section-icon">👤</span>
+        <h2>Personal Information</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>FIRST NAME</label>
+          <p>{{ user()?.prenom }}</p>
+        </div>
+        <div class="info-item">
+          <label>LAST NAME</label>
+          <p>{{ user()?.nom }}</p>
+        </div>
+        <div class="info-item">
+          <label>EMAIL</label>
+          <p>{{ user()?.email }}</p>
+        </div>
+        <div class="info-item">
+          <label>DATE OF BIRTH</label>
+          <p>{{ user()?.dateNaissance || 'Not provided' }}</p>
+        </div>
+        <div class="info-item">
+          <label>GENDER</label>
+          <p>{{ user()?.sexe || 'Not provided' }}</p>
+        </div>
+        <div class="info-item">
+          <label>GOVERNORATE</label>
+          <p>{{ user()?.gouvernorat || 'Not provided' }}</p>
+        </div>
+        <div class="info-item">
+          <label>ROLE</label>
+          <p>{{ formatRole(user()?.role) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Information Section -->
+    <div class="profile-section" *ngIf="isProfessional()">
+      <div class="section-header">
+        <span class="section-icon">💼</span>
+        <h2>Professional Information</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>POSITION</label>
+          <p>{{ user()?.poste || 'Not provided' }}</p>
+        </div>
+        <div class="info-item">
+          <label>COMPANY NAME</label>
+          <p>{{ user()?.nomSociete || 'Not provided' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="profile-section" *ngIf="isProfessional()">
+      <div class="section-header">
+        <span class="section-icon">📚</span>
+        <h2>Skills</h2>
+      </div>
+      <div class="skills-list">
+        <p *ngIf="user()?.skills">{{ user()?.skills }}</p>
+        <p *ngIf="!user()?.skills" class="placeholder">Not provided</p>
+      </div>
+    </div>
+
+    <!-- Resume/CV Section -->
+    <div class="profile-section" *ngIf="isProfessional()">
+      <div class="section-header">
+        <span class="section-icon">📄</span>
+        <div class="header-with-action">
+          <h2>Resume/CV</h2>
+          <button class="btn-link" *ngIf="user()?.cvGenerique" (click)="downloadCV()">Download</button>
+        </div>
+      </div>
+      <div class="cv-status">
+        <span class="folder-icon">📁</span>
+        <p *ngIf="user()?.cvGenerique">Available in your account</p>
+        <p *ngIf="!user()?.cvGenerique" class="placeholder">Not uploaded yet</p>
+      </div>
+    </div>
+
+    <!-- Profile Completeness -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h2>Profile Completeness</h2>
+      </div>
+      <div class="completeness-bar">
+        <div class="progress" [style.width.%]="calculateCompleteness()"></div>
+      </div>
+      <p class="completeness-text">Complete your profile to improve your visibility to recruiters</p>
+    </div>
+  </div>
+
+  <!-- Delete Account Section -->
+  <div class="delete-section">
+    <button class="btn-danger" (click)="openDeleteModal()">Delete Account</button>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<app-delete-account-modal
+  *ngIf="showDeleteModal()"
+  (onCancel)="closeDeleteModal()"
+  (onConfirm)="handleDeleteAccount()"
+></app-delete-account-modal>
+
+<ng-template #loading>
+  <div class="loading">Loading profile...</div>
+</ng-template>
