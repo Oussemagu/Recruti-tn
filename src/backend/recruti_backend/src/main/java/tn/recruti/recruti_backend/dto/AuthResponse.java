@@ -16,7 +16,7 @@ public class AuthResponse {
 	//token JWT à inclure sans chaque requete suivante
 	//Format dans le header HTTP : "Authorization : Bearer <token>"
 	private String token;
-	
+	private Long id ;
 	//Informations du user connecté
 	private String email;
 	private String nom;

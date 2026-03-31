@@ -198,51 +198,60 @@
         </div>
 
         <!-- STEP 3 — Details -->
-        <div class="form-step" *ngIf="step === 3">
+       <!-- STEP 3 — Details -->
+@if (step === 3) {
+  <div class="form-step">
 
-          <div class="field-row">
-            <div class="field">
-              <input id="nomSociete" type="text" placeholder=" "
-                     [(ngModel)]="form.nomSociete" name="nomSociete">
-              <label for="nomSociete">Company</label>
-              <span class="field-bar"></span>
-            </div>
-            <div class="field">
-              <input id="poste" type="text" placeholder=" "
-                     [(ngModel)]="form.poste" name="poste">
-              <label for="poste">Position</label>
-              <span class="field-bar"></span>
-            </div>
-          </div>
-          <!--
-          <div class="field">
-            <input id="skills" type="text" placeholder=" "
-                   [(ngModel)]="form.skills" name="skills">
-            <label for="skills">Skills (e.g. Java, Angular…)</label>
-            <span class="field-icon">🛠</span>
-            <span class="field-bar"></span>
-          </div>
-        -->
-          <div class="error-banner" *ngIf="error">
-            <span>⚠</span> {{ error }}
-          </div>
-
-          <div class="step-actions">
-            <button type="button" class="btn-back" (click)="prevStep()">← Back</button>
-            <button type="submit" class="btn-submit" [disabled]="loading">
-              <span class="btn-text" *ngIf="!loading">
-                Create account
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </span>
-              <span class="btn-loader" *ngIf="loading">
-                <span></span><span></span><span></span>
-              </span>
-            </button>
-          </div>
-
+    @if (form.role === 'RECRUTEUR') {
+      <div class="field-row">
+        <div class="field">
+          <input id="nomSociete" type="text" placeholder=" "
+                 [(ngModel)]="form.nomSociete" name="nomSociete">
+          <label for="nomSociete">Company</label>
+          <span class="field-bar"></span>
         </div>
+        <div class="field">
+          <input id="poste" type="text" placeholder=" "
+                 [(ngModel)]="form.poste" name="poste">
+          <label for="poste">Position</label>
+          <span class="field-bar"></span>
+        </div>
+      </div>
+    }
+
+    @if (form.role === 'CANDIDAT') {
+      <div class="field">
+        <input id="skills" type="text" placeholder=" "
+               [(ngModel)]="form.skills" name="skills">
+        <label for="skills">Skills (e.g. Java, Angular…)</label>
+        <span class="field-icon">🛠</span>
+        <span class="field-bar"></span>
+      </div>
+    }
+
+    @if (error) {
+      <div class="error-banner">
+        <span>⚠</span> {{ error }}
+      </div>
+    }
+
+    <div class="step-actions">
+      <button type="button" class="btn-back" (click)="prevStep()">← Back</button>
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        <span class="btn-text" *ngIf="!loading">
+          Create account
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="btn-loader" *ngIf="loading">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
+
+  </div>
+}
 
       </form>
 

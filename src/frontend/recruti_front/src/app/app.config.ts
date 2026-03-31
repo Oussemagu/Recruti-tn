@@ -4,11 +4,12 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor'
 
+import { provideAnimations } from '@angular/platform-browser/animations'; // ← ajouter
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), 
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }),
       provideRouter(routes, withViewTransitions()),
     // Active HttpClient + injecte le JWT interceptor automatiquement
-    provideHttpClient(withInterceptors([jwtInterceptor])),
+    provideHttpClient(withInterceptors([jwtInterceptor])),provideAnimations()
   ]
 };

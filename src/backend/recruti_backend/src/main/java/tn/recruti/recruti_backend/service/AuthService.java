@@ -67,10 +67,11 @@ public class AuthService {
         userRepository.save(user);
 
         // Génération du token JWT avec l'email comme subject
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole().name());
+
 
         // Retourne le token + infos utilisateur au controller
-        return new AuthResponse(token, user.getEmail(), user.getNom(), user.getPrenom(), user.getRole());
+        return new AuthResponse(token, user.getId(), user.getEmail(), user.getNom(), user.getPrenom(), user.getRole());
     }
 
     /**
@@ -99,8 +100,8 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Génération d'un nouveau token JWT à chaque connexion
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole().name());
 
-        return new AuthResponse(token, user.getEmail(), user.getNom(), user.getPrenom(), user.getRole());
+        return new AuthResponse(token,user.getId(), user.getEmail(), user.getNom(), user.getPrenom(), user.getRole());
     }
 }

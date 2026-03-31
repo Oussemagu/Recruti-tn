@@ -1,0 +1,367 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mes Offres</h1>
+      <p class="page-subtitle">Gérez vos offres d'emploi</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Ajouter une offre
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  @if (success()) {
+    <div class="alert alert-success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      {{ success() }}
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+  }
+
+  <!-- Offres Grid -->
+  @else if (offers().length > 0) {
+    <div class="offers-grid">
+      @for (offer of offers(); track offer.id) {
+        <div class="offer-card">
+          <div class="offer-header">
+            <div class="offer-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <div class="offer-title-section">
+              <h3 class="offer-title">{{ offer.titre }}</h3>
+              @if (offer.available) {
+                <span class="offer-badge">
+                  <span class="badge-dot"></span>
+                  Disponible
+                </span>
+              } @else {
+                <span class="offer-badge" style="background: #FEE2E2; color: #991B1B;">
+                  <span class="badge-dot"></span>
+                  Fermée
+                </span>
+              }
+            </div>
+          </div>
+
+          <div class="offer-body">
+            <p class="offer-description">{{ offer.description }}</p>
+            <div class="offer-meta">
+              <div class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                {{ formatDate(offer.dateEmission) }}
+              </div>
+              @if (offer.tags) {
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                  </svg>
+                  {{ offer.tags }}
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="offer-footer">
+            <button class="btn btn-sm btn-outline" (click)="openEditModal(offer)" title="Modifier">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Modifier
+            </button>
+            <button class="btn btn-sm btn-secondary" title="Voir candidatures">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              Candidatures
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="openDeleteModal(offer)" title="Supprimer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button
+          class="page-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1">
+          ← Précédent
+        </button>
+
+        <span class="cbtn-info">
+          Page {{ currentPage() }} sur {{ totalPages() }} ({{ totalElements() }} offres)
+        </span>
+
+        <button
+          class="page-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()">
+          Suivant →
+        </button>
+      </div>
+    }
+  }
+
+  <!-- Empty State -->
+  @else {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+      </svg>
+      <h3>Aucune offre pour le moment</h3>
+      <p>Commencez par créer votre première offre d'emploi</p>
+      <button class="btn btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
+        Créer une offre
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Modal: Ajouter une offre -->
+@if (showAddModal()) {
+  <div class="modal-overlay" (click)="closeModals()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Nouvelle offre</h2>
+        <button class="btn-close" (click)="closeModals()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form (submit)="submitAddOffer(); $event.preventDefault()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="add-titre">Titre de l'offre *</label>
+            <input
+              type="text"
+              id="add-titre"
+              class="form-control"
+              [(ngModel)]="formData.titre"
+              name="titre"
+              required
+              placeholder="Ex: Développeur Full Stack">
+          </div>
+
+          <div class="form-group">
+            <label for="add-description">Description *</label>
+            <textarea
+              id="add-description"
+              class="form-control"
+              [(ngModel)]="formData.description"
+              name="description"
+              rows="6"
+              required
+              placeholder="Décrivez les responsabilités, compétences requises, etc."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="add-tags">Tags</label>
+            <input
+              type="text"
+              id="add-tags"
+              class="form-control"
+              [(ngModel)]="formData.tags"
+              name="tags"
+              placeholder="Ex: Angular, Spring Boot, PostgreSQL">
+            <small class="form-hint">Séparez les tags par des virgules</small>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="formData.available"
+                name="available">
+              <span>Offre disponible (active)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="closeModals()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!formData.titre || !formData.description">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Créer l'offre
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal: Modifier une offre -->
+@if (showEditModal() && selectedOffer) {
+  <div class="modal-overlay" (click)="closeModals()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Modifier l'offre</h2>
+        <button class="btn-close" (click)="closeModals()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form (submit)="submitEditOffer(); $event.preventDefault()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="edit-titre">Titre de l'offre *</label>
+            <input
+              type="text"
+              id="edit-titre"
+              class="form-control"
+              [(ngModel)]="formData.titre"
+              name="titre"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Description *</label>
+            <textarea
+              id="edit-description"
+              class="form-control"
+              [(ngModel)]="formData.description"
+              name="description"
+              rows="6"
+              required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-tags">Tags</label>
+            <input
+              type="text"
+              id="edit-tags"
+              class="form-control"
+              [(ngModel)]="formData.tags"
+              name="tags">
+            <small class="form-hint">Séparez les tags par des virgules</small>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="formData.available"
+                name="available">
+              <span>Offre disponible (active)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="closeModals()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!formData.titre || !formData.description">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal: Confirmation de suppression -->
+@if (showDeleteModal() && selectedOffer) {
+  <div class="modal-overlay" (click)="closeModals()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmer la suppression</h2>
+        <button class="btn-close" (click)="closeModals()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div style="text-align: center; padding: 1rem;">
+          <div style="width: 64px; height: 64px; margin: 0 auto 1rem; background: #FEE2E2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem;">Êtes-vous sûr ?</h3>
+          <p style="margin: 0; color: var(--gray-600);">
+            Voulez-vous vraiment supprimer l'offre <strong>"{{ selectedOffer.titre }}"</strong> ?<br>
+            Cette action est irréversible.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="closeModals()">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Oui, supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+}

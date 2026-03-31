@@ -13,7 +13,7 @@ import { LoginRequest } from '../../../core/models/user.model';
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
-  role: string = 'recruiter';  // a verifier 
+  role: string = 'recruiter';  // a verifier
   private auth   = inject(AuthService);
   private route  = inject(ActivatedRoute);
   private router = inject(Router);
@@ -24,10 +24,7 @@ export class LoginComponent implements OnInit {
   error   = '';
 
   ngOnInit() {
-    // Redirige si déjà connecté
-    if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
-    }
+
   }
 
   onSubmit() {
@@ -37,7 +34,7 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.form).subscribe({
       next: () => {
         // Redirection après connexion réussie
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/candidat/offres']);
       },
       error: (err:any) => {
         // 401 → mauvais identifiants

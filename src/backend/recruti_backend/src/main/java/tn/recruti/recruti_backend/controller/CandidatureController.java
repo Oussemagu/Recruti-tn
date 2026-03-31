@@ -90,10 +90,12 @@ public class CandidatureController {
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_PDF)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
+               return ResponseEntity.ok()
+    .contentType(MediaType.APPLICATION_PDF)
+    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+    .header("X-Frame-Options", "ALLOWALL")
+    .header("Content-Security-Policy", "frame-ancestors *")
+    .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
             }

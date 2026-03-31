@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { RegisterRequest } from '../../../core/models/user.model';
-import {Router} from "@angular/router";
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -15,17 +15,15 @@ import {Router} from "@angular/router";
 export class RegisterComponent {
   step = 1;
 
-  nextStep() { if (this.step < 3) this.step++; }
-  prevStep() { if (this.step > 1) this.step--; }
   private auth = inject(AuthService);
   private router = inject(Router);
 
- form: RegisterRequest = {
+  form: RegisterRequest = {
     nom: '',
     prenom: '',
     email: '',
     password: '',
-    role: 'RECRUTEUR',
+    role: null,
     dateNaissance: '',
     nomSociete: '',
     poste: '',
@@ -34,34 +32,61 @@ export class RegisterComponent {
     sexe: '',
   };
 
-  industries = ['Technology', 'Finance', 'Healthcare', 'Education', 'Retail', 'Manufacturing', 'Other'];
-  sizes = ['1-10', '11-50', '51-200', '201-500', '500+'];
   gouvernorats = [
-  'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès',
-  'Gafsa', 'Jendouba', 'Kairouan', 'Kasserine', 'Kébili',
-  'Le Kef', 'Mahdia', 'Manouba', 'Médenine', 'Monastir',
-  'Nabeul', 'Sfax', 'Sidi Bouzid', 'Siliana', 'Sousse',
-  'Tataouine', 'Tozeur', 'Tunis', 'Zaghouan'
-];
+    'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès',
+    'Gafsa', 'Jendouba', 'Kairouan', 'Kasserine', 'Kébili',
+    'Le Kef', 'Mahdia', 'Manouba', 'Médenine', 'Monastir',
+    'Nabeul', 'Sfax', 'Sidi Bouzid', 'Siliana', 'Sousse',
+    'Tataouine', 'Tozeur', 'Tunis', 'Zaghouan'
+  ];
+
   showPw = false;
   loading = false;
   error = '';
 
-  onSubmit() {
+  nextStep() { if (this.step < 3) this.step++; }
+  prevStep() { if (this.step > 1) this.step--; }
+
+  /**
+   * Called when role changes in step 2.
+   * Clears fields that don't belong to the selected role
+   * so no ghost data is sent to the backend.
+   */
+  onRoleChange() {
+    if (this.form.role === 'CANDIDAT') {
+        this.form.nomSociete = '';
+        this.form.poste = '';
+    } else if (this.form.role === 'RECRUTEUR') {
+        this.form.skills = '';
+    }
+}
+
+ onSubmit() {
+    // Guard — should never happen since the button is disabled, but safety net
+    if (!this.form.role) {
+      this.error = 'Please select a role.';
+      return;
+    }
+
+    // Cleanup ghost fields based on role
+    if (this.form.role === 'CANDIDAT') {
+      this.form.nomSociete = '';
+      this.form.poste = '';
+    } else if (this.form.role === 'RECRUTEUR') {
+      this.form.skills = '';
+    }
+
     this.loading = true;
-    this.error   = '';
+    this.error = '';
 
     this.auth.register(this.form).subscribe({
       next: () => {
-        // Redirection après inscription réussie
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/candidat']);
       },
-      error: (err:any) => {
-        // Affiche le message d'erreur du backend si disponible
+      error: (err: any) => {
         this.error = err.error?.message || 'Inscription échouée. Réessayez.';
         this.loading = false;
       }
     });
-  }
 }
-
+}
