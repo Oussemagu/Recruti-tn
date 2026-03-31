@@ -43,9 +43,11 @@ public class JwtUtil {
      * @param email identifiant unique de l'utilisateur
      * @return token JWT sous forme de String
      */
-    public String generateToken(String email) {
+    public String generateToken(String email, Long id, String role) {
         return Jwts.builder()
                 .subject(email)                                           // payload : email de l'utilisateur
+                .claim("id", id)   
+                .claim("role",role)
                 .issuedAt(new Date())                                     // date de création du token
                 .expiration(new Date(System.currentTimeMillis() + expiration)) // date d'expiration
                 .signWith(getKey())                                       // signature HMAC-SHA256

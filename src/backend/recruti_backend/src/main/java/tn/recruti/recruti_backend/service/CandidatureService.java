@@ -67,7 +67,7 @@ public class CandidatureService {
 
         Candidature candidature = new Candidature();
         candidature.setDatePostulation(LocalDate.now());
-        candidature.setCvPath(filePath.toString());
+        candidature.setCvPath(fileName);
         candidature.setScoreCv(0);
         candidature.setStatus(statuAnalyse.INITIAL);
         candidature.setCandidat(candidat);
@@ -108,7 +108,7 @@ public class CandidatureService {
             Path filePath = Paths.get(uploadDir, fileName);
             Files.createDirectories(filePath.getParent());
             Files.write(filePath, dto.getCv().getBytes());
-            c.setCvPath(filePath.toString());
+            c.setCvPath(fileName);
         }
 
         if (dto.getScoreCv() != null) {

@@ -16,8 +16,7 @@ export class AuthService {
   private _currentUser = signal<User | null>(null);
 
   readonly currentUser  = this._currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => !!this._currentUser());
-  readonly userRole = computed(() => this._currentUser()?.role ?? null);
+   readonly userRole = computed(() => this._currentUser()?.role ?? null);
   readonly userId = computed(() => this._currentUser()?.id ?? null);
 
   constructor(private http: HttpClient, private router: Router) {
@@ -114,4 +113,22 @@ export class AuthService {
       localStorage.setItem('recruiti_user', JSON.stringify(updatedUser));
     }
   }
+
+
+  // Dans AuthService — méthodes à ajouter
+
+private readonly USER_KEY = 'recruiti_user';
+
+getCurrentUser(): any {
+  const raw = localStorage.getItem(this.USER_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+isRecruteur(): boolean {
+  return this.getCurrentUser()?.role === 'RECRUTEUR';
+}
+
+isAuthenticated(): boolean {
+  return !!this.getCurrentUser()?.token;
+}
 }

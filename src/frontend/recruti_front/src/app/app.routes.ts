@@ -1,16 +1,23 @@
 import { Routes } from '@angular/router';
-//import { LandingComponent } from './features/landing/landing.component';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { authGuard } from './core/guards/auth-guards';
-import { PROFILE_ROUTES } from './features/profile/profile.routes';
 
 export const routes: Routes = [
- // { path: '', component: LandingComponent },
-  { path: 'auth/login', component: LoginComponent },
-  { path: 'auth/register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'profile', children: PROFILE_ROUTES, canActivate: [authGuard] },
-  { path: '**', redirectTo: '' },
+  {
+    path: 'auth/login',
+    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'auth/register',
+    loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
+  },
+  {
+    path: 'candidat',
+    loadComponent: () => import('./components/candidate-offers/candidate-offers.component').then(m => m.CandidateOffersComponent),
+    children: [
+      { path: 'offres',      loadComponent: () => import('./components/all-offers/all-offers.component').then(m => m.AllOffersComponent) },
+      { path: 'mes-offres',  loadComponent: () => import('./components/my-offers/my-offers.component').then(m => m.MyOffersComponent) },
+      { path: '',            redirectTo: 'offres', pathMatch: 'full' }
+    ]
+  },
+  { path: '',         redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '**',       redirectTo: 'auth/login' }
 ];

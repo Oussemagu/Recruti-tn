@@ -1,8 +1,10 @@
+// offer.model.ts
 export interface Offer {
   id?: number;
+  dateEmission: string;
   titre: string;
   description: string;
-  tags: string;
+  tags?: string;
   available: boolean;
-  dateEmission: string;
+  recruteurId?: number;
 }

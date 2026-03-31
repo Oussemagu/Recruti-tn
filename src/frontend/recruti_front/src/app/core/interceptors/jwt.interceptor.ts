@@ -1,9 +1,9 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn ,HttpRequest, HttpHandlerFn} from '@angular/common/http';
 
 // Intercepteur fonctionnel Angular 17+
 // Ajoute automatiquement le token JWT dans le header
 // de CHAQUE requête HTTP sortante
-export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
+export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
 
   // Récupère le token depuis localStorage
   const stored = localStorage.getItem('recruiti_user');
