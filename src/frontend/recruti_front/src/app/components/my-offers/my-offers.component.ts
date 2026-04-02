@@ -303,4 +303,14 @@ export class MyOffersComponent implements OnInit {
       }
     });
   }
+
+  /**
+   * Ouvre le CV du candidat
+   */
+  viewCv(candidature: any): void {
+    if (candidature.cvPath) {
+      const cvUrl = this.candidatureService.getCvUrl(candidature.cvPath);
+      window.open(cvUrl, '_blank');
+    }
+  }
 }
