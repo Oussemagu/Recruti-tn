@@ -33,6 +33,10 @@ export class CandidatureService {
     return this.http.delete(`${this.baseUrl}/${idCandidature}`, { responseType: 'text' });
   }
 
+  getCandidaturesByOffer(offerId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/offre/${offerId}`);
+  }
+
   // Méthode pour obtenir l'URL du CV (le backend servira le fichier)
   getCvUrl(cvPath: string): string {
     // Le cvPath du backend ressemble à: /app/uploads/cvs/cv_1_1773935872198.pdf

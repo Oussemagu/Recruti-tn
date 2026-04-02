@@ -1,8 +1,9 @@
 package tn.recruti.recruti_backend.dto;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 import tn.recruti.recruti_backend.enums.statuAnalyse;
-import java.time.LocalDate;
 
 @Data
 public class CandidatureResponseDTO {
@@ -12,4 +13,7 @@ public class CandidatureResponseDTO {
     private String cvPath;
     private int scoreCv;
     private statuAnalyse status;
+    private String candidatNom;      // nom du candidat
+    private String candidatPrenom;   // prenom du candidat
+    private String candidatEmail;    // email du candidat
 }
