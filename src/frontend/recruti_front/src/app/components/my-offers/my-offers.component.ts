@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth';
 import { OfferService,OfferResponse, OfferRequest  } from '../../services/offer.service';
+import { CandidatureService } from '../../services/candidature.service';
 import { PagedResponse } from '../../models/paged-response.model';
 
 @Component({
@@ -30,6 +31,11 @@ export class MyOffersComponent implements OnInit {
   showAddModal = signal<boolean>(false);
   showEditModal = signal<boolean>(false);
   showDeleteModal = signal<boolean>(false);
+  showCandidaturesModal = signal<boolean>(false);
+
+  // Candidatures
+  candidatures = signal<any[]>([]);
+  candidaturesLoading = signal<boolean>(false);
 
   // Formulaire
   formData = {
@@ -45,7 +51,8 @@ export class MyOffersComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private offerService: OfferService
+    private offerService: OfferService,
+    private candidatureService: CandidatureService
   ) {}
 
   ngOnInit(): void {
@@ -123,6 +130,7 @@ export class MyOffersComponent implements OnInit {
     this.showAddModal.set(false);
     this.showEditModal.set(false);
     this.showDeleteModal.set(false);
+    this.showCandidaturesModal.set(false);
     this.selectedOffer = null;
     this.resetForm();
   }
@@ -263,6 +271,36 @@ export class MyOffersComponent implements OnInit {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
+    });
+  }
+
+  /**
+   * Ouvre le modal pour voir les candidats d'une offre
+   */
+  openCandidaturesModal(offer: OfferResponse): void {
+    this.selectedOffer = offer;
+    this.candidaturesLoading.set(true);
+    this.candidatures.set([]);
+    this.showCandidaturesModal.set(true);
+    this.loadCandidatures(offer.id);
+  }
+
+  /**
+   * Charge les candidatures pour une offre
+   */
+  loadCandidatures(offerId: number): void {
+    this.candidaturesLoading.set(true);
+    this.candidatureService.getCandidaturesByOffer(offerId).subscribe({
+      next: (data: any[]) => {
+        this.candidatures.set(data);
+        this.candidaturesLoading.set(false);
+      },
+      error: (err: any) => {
+        console.error('Erreur lors du chargement des candidatures', err);
+        this.candidatures.set([]);
+        this.candidaturesLoading.set(false);
+        this.error.set('Erreur lors du chargement des candidatures');
+      }
     });
   }
 }

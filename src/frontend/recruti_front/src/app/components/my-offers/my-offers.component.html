@@ -103,7 +103,7 @@
               </svg>
               Modifier
             </button>
-            <button class="btn btn-sm btn-secondary" title="Voir candidatures">
+            <button class="btn btn-sm btn-secondary" (click)="openCandidaturesModal(offer)" title="Voir candidatures">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
@@ -360,6 +360,74 @@
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
           Oui, supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: Voir les candidatures -->
+@if (showCandidaturesModal() && selectedOffer) {
+  <div class="modal-overlay" (click)="closeModals()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Candidatures pour "{{ selectedOffer.titre }}"</h2>
+        <button class="btn-close" (click)="closeModals()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @if (candidaturesLoading()) {
+          <div style="text-align: center; padding: 2rem;">
+            <div class="spinner" style="display: inline-block;"></div>
+            <p style="margin-top: 1rem; color: var(--gray-600);">Chargement des candidatures...</p>
+          </div>
+        } @else if (candidatures().length > 0) {
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            @for (candidature of candidatures(); track candidature.idCandidature) {
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.5rem; border: 1px solid var(--gray-200);">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0;">
+                  {{ (candidature.candidatPrenom || '?').charAt(0).toUpperCase() }}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <h4 style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: 500; word-break: break-word;">
+                    {{ candidature.candidatPrenom }} {{ candidature.candidatNom }}
+                  </h4>
+                  <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem; word-break: break-all;">
+                    {{ candidature.candidatEmail }}
+                  </p>
+                </div>
+                <div style="flex-shrink: 0; text-align: right;">
+                  <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px;">Statut</p>
+                  <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500;"
+                    [style]="candidature.status === 'ACCEPTED' ? 'background: #DCFCE7; color: #166534;' : candidature.status === 'REJECTED' ? 'background: #FEE2E2; color: #991B1B;' : 'background: #FEF3C7; color: #92400E;'">
+                    {{ candidature.status === 'ACCEPTED' ? 'Accepté' : candidature.status === 'REJECTED' ? 'Rejeté' : 'En attente' }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div style="text-align: center; padding: 2rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <h3 style="margin-top: 1rem;">Aucune candidature</h3>
+            <p style="color: var(--gray-600);">Cette offre n'a encore reçu aucune candidature</p>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="closeModals()">
+          Fermer
         </button>
       </div>
     </div>

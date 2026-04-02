@@ -1,9 +1,18 @@
 package tn.recruti.recruti_backend.service;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
 import tn.recruti.recruti_backend.Exception.CandidatureDejaExisteException;
 import tn.recruti.recruti_backend.Exception.RessourceNotFoundException;
 import tn.recruti.recruti_backend.dto.CandidatureResponseDTO;
@@ -15,14 +24,6 @@ import tn.recruti.recruti_backend.model.User;
 import tn.recruti.recruti_backend.repository.CandidatureRepository;
 import tn.recruti.recruti_backend.repository.OfferRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,14 @@ public class CandidatureService {
     dto.setCvPath(c.getCvPath());
     dto.setScoreCv(c.getScoreCv());
     dto.setStatus(c.getStatus());
+    
+    // Ajouter les informations du candidat
+    if (c.getCandidat() != null) {
+        dto.setCandidatNom(c.getCandidat().getNom());
+        dto.setCandidatPrenom(c.getCandidat().getPrenom());
+        dto.setCandidatEmail(c.getCandidat().getEmail());
+    }
+    
     return dto;
 }
 
