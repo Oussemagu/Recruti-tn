@@ -112,6 +112,13 @@
               </svg>
               Candidatures
             </button>
+            <button class="btn btn-sm btn-secondary" (click)="openQuizModal(offer)" title="Gerer Quiz">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              Quiz
+            </button>
             <button class="btn btn-sm btn-danger" (click)="openDeleteModal(offer)" title="Supprimer">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -236,6 +243,140 @@
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             Créer l'offre
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal: Gestion quiz -->
+@if (showQuizModal() && selectedOffer) {
+  <div class="modal-overlay" (click)="closeModals()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" style="max-width: 760px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Quiz de l'offre "{{ selectedOffer.titre }}"</h2>
+        <button class="btn-close" (click)="closeModals()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form (submit)="submitQuiz(); $event.preventDefault()">
+        <div class="modal-body">
+          @if (quizLoading()) {
+            <div style="text-align: center; padding: 1rem 0; color: var(--gray-600);">
+              <div class="spinner" style="display: inline-block;"></div>
+              <p style="margin-top: 0.75rem;">Chargement du quiz...</p>
+            </div>
+          } @else {
+            @if (selectedQuizId()) {
+              <div class="alert alert-success" style="margin-bottom: 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Quiz existant détecté. Vous pouvez le modifier ci-dessous.
+              </div>
+            } @else {
+              <div class="alert" style="margin-bottom: 1rem; background: #DBEAFE; color: #1E3A8A; border: 1px solid #93C5FD;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Aucun quiz lié à cette offre. Remplissez les champs pour en créer un.
+              </div>
+            }
+
+            @for (quizQuestion of quizQuestionsForm; track $index; let questionIndex = $index) {
+              <div style="border: 1px solid var(--gray-200); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background: #fff;">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; gap: 1rem;">
+                  <h3 style="margin:0; font-size:1rem; color: var(--gray-900);">Question {{ $index + 1 }}</h3>
+                  @if (quizQuestionsForm.length > 1) {
+                    <button type="button" class="btn btn-outline btn-sm" (click)="removeQuestion(questionIndex)">
+                      Supprimer question
+                    </button>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label [attr.for]="'question-' + questionIndex">Question *</label>
+                  <input
+                    [id]="'question-' + questionIndex"
+                    class="form-control"
+                    [(ngModel)]="quizQuestion.question"
+                    [name]="'question' + questionIndex"
+                    type="text"
+                    required
+                    placeholder="Ex: Angular est un framework ?" />
+                </div>
+
+                <div class="form-group">
+                  <label>Reponses *</label>
+                  @for (choix of quizQuestion.choix; track $index; let choiceIndex = $index) {
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                      <input
+                        class="form-control"
+                        [(ngModel)]="quizQuestion.choix[choiceIndex]"
+                        [name]="'question' + questionIndex + 'choice' + choiceIndex"
+                        type="text"
+                        required
+                        [placeholder]="'Reponse ' + (choiceIndex + 1)" />
+
+                      @if (quizQuestion.choix.length > 2) {
+                        <button type="button" class="btn btn-outline" (click)="removeChoice(questionIndex, choiceIndex)">
+                          Retirer
+                        </button>
+                      }
+                    </div>
+                  }
+
+                  <button type="button" class="btn btn-outline btn-sm" (click)="addChoice(questionIndex)">
+                    Ajouter reponse
+                  </button>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label [attr.for]="'true-answer-' + questionIndex">Vraie reponse *</label>
+                  <select
+                    [id]="'true-answer-' + questionIndex"
+                    class="form-control"
+                    [(ngModel)]="quizQuestion.vraieReponse"
+                    [name]="'trueAnswer' + questionIndex"
+                    required>
+                    <option value="">Choisir la vraie reponse</option>
+                    @for (choice of quizQuestion.choix; track $index; let choiceIndex = $index) {
+                      @if (choice.trim()) {
+                        <option [value]="choice">{{ choice }}</option>
+                      }
+                    }
+                  </select>
+                </div>
+              </div>
+            }
+
+            <button type="button" class="btn btn-secondary" (click)="addQuestion()">
+              Ajouter question
+            </button>
+          }
+        </div>
+
+        <div class="modal-footer">
+          @if (selectedQuizId()) {
+            <button type="button" class="btn btn-danger" (click)="confirmDeleteQuiz()" [disabled]="quizSubmitting() || quizLoading()">
+              Supprimer le quiz
+            </button>
+          }
+          <button type="button" class="btn btn-outline" (click)="closeModals()">
+            Fermer
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="quizSubmitting() || quizLoading() || !isQuizFormValid()">
+            {{ selectedQuizId() ? 'Mettre a jour le quiz' : 'Creer le quiz' }}
           </button>
         </div>
       </form>
