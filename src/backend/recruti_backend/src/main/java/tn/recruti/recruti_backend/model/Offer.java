@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Offer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
