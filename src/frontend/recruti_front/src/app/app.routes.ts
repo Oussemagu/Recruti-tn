@@ -18,6 +18,10 @@ export const routes: Routes = [
       { path: '',            redirectTo: 'offres', pathMatch: 'full' }
     ]
   },
+  { 
+      path:'home',
+      loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
+  },
   { path: '',         redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**',       redirectTo: 'auth/login' }
 ];
