@@ -1,0 +1,168 @@
+<main class="schedule-page">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <span>Candidates</span>
+    <span class="material-symbols-outlined">chevron_right</span>
+    <span>{{ candidate.name }}</span>
+    <span class="material-symbols-outlined">chevron_right</span>
+    <span class="active-crumb">Schedule Interview</span>
+  </div>
+
+  <h2 class="page-title">
+    Schedule Call with <span class="text-primary">{{ candidate.name }}</span>
+  </h2>
+
+  <div class="bento-grid">
+    <!-- Left Column -->
+    <div class="left-col">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <img [src]="candidate.avatar" [alt]="candidate.name" class="profile-avatar" />
+        <div class="profile-body">
+          <h3 class="candidate-name">{{ candidate.name }}</h3>
+          <p class="candidate-role">{{ candidate.role }}</p>
+          <div class="candidate-meta">
+            <div class="meta-item">
+              <span class="material-symbols-outlined">location_on</span>
+              <span>{{ candidate.location }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="material-symbols-outlined">work_history</span>
+              <span>{{ candidate.experience }}</span>
+            </div>
+          </div>
+          <div class="skills-section">
+            <span class="skills-label">Skills Highlight</span>
+            <div class="skills-chips">
+              <span class="chip" *ngFor="let skill of candidate.skills">{{ skill }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview Context -->
+      <div class="context-card">
+        <h4 class="context-title">
+          <span class="material-symbols-outlined">info</span>
+          Interview Context
+        </h4>
+        <p class="context-text">{{ candidate.interviewContext }}</p>
+      </div>
+    </div>
+
+    <!-- Right Column: Main Interaction Panel -->
+    <div class="main-panel">
+      <!-- Calendar Header -->
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <div class="cal-icon">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
+          <div>
+            <h3 class="panel-title">Select Date &amp; Time</h3>
+            <p class="panel-subtitle">Availability based on your calendar sync</p>
+          </div>
+        </div>
+        <div class="cal-nav">
+          <button class="nav-btn" (click)="prevWeek()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <button class="nav-btn" (click)="nextWeek()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid">
+        <div class="day-label" *ngFor="let d of dayLabels">{{ d }}</div>
+        <button
+          *ngFor="let day of calendarDays"
+          class="day-btn"
+          [class.disabled]="day.disabled"
+          [class.selected]="day.date === selectedDate"
+          [disabled]="day.disabled"
+          (click)="selectDate(day.date)">
+          {{ day.date }}
+        </button>
+      </div>
+
+      <!-- Time Slots -->
+      <div class="slots-section">
+        <span class="slots-label">AVAILABLE SLOTS — SEP {{ selectedDate }}</span>
+        <div class="slots-grid">
+          <button
+            *ngFor="let slot of timeSlots"
+            class="slot-btn"
+            [class.selected]="slot.time === selectedSlot"
+            (click)="selectSlot(slot.time)">
+            <span class="slot-time">{{ slot.time }}</span>
+            <span class="slot-duration">{{ slot.duration }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Google Meet Integration -->
+      <div class="meet-section">
+        <div class="meet-header">
+          <div class="meet-title-group">
+            <div class="meet-logo-wrap">
+              <svg viewBox="0 0 48 48" class="meet-logo" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#4CAF50" d="M24,10C16.268,10,10,16.268,10,24s6.268,14,14,14s14-6.268,14-14S31.732,10,24,10z"/>
+                <path fill="#FFF" d="M30,24c0-3.314-2.686-6-6-6s-6,2.686-6,6s2.686,6,6,6S30,27.314,30,24z"/>
+                <path fill="#1976D2" d="M44,24l-8-5v10L44,24z"/>
+                <path fill="#1976D2" d="M36,19h-8v10h8V19z"/>
+              </svg>
+            </div>
+            <h4 class="meet-title">Video Conference</h4>
+          </div>
+          <button class="autogen-btn" (click)="generateMeetLink()">Auto-generate Link</button>
+        </div>
+        <div class="meet-input-wrap">
+          <input type="text" [value]="meetLink" readonly class="meet-input" />
+          <button class="copy-btn" (click)="copyMeetLink()">
+            <span class="material-symbols-outlined">{{ copied ? 'check' : 'content_copy' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="panel-footer">
+        <div class="check-status">
+          <span class="material-symbols-outlined">check_circle</span>
+          Calendar collision check passed
+        </div>
+        <div class="footer-actions">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-send signature-gradient" (click)="sendInvitation()">
+            Send Invitation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast Notification -->
+<div class="toast" [class.visible]="showToast">
+  <div class="toast-icon">
+    <span class="material-symbols-outlined">auto_awesome</span>
+  </div>
+  <div class="toast-body">
+    <h5 class="toast-title">Invitation Ready</h5>
+    <p class="toast-text">
+      An email with the Google Meet link and calendar attachment will be sent to
+      <strong>{{ candidate.email }}</strong> once you confirm.
+    </p>
+    <div class="toast-meta">
+      <div class="avatars">
+        <img src="https://i.pravatar.cc/24?img=12" class="mini-avatar" />
+        <img src="https://i.pravatar.cc/24?img=7" class="mini-avatar" />
+      </div>
+      <span class="shared-label">Shared invite</span>
+    </div>
+  </div>
+  <button class="toast-close" (click)="showToast = false">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+</div>

@@ -22,6 +22,7 @@ export const routes: Routes = [
       path:'home',
       loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
+  {path: 'schedule-interview', loadComponent: () => import('./features/schedule-interview/schedule-interview.component').then(m => m.ScheduleInterviewComponent) },
   { path: '',         redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**',       redirectTo: 'auth/login' }
 ];

@@ -1,0 +1,566 @@
+.schedule-page {
+  padding: 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  /***/
+
+}
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #F8F9FA;
+  box-sizing: border-box;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-bottom: 16px;
+}
+.breadcrumb .material-symbols-outlined {
+  font-size: 14px;
+}
+.breadcrumb .active-crumb {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 48px;
+}
+.page-title .text-primary {
+  color: var(--primary);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+}
+@media (max-width: 900px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left Column */
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-card {
+  background: var(--surface-container-lowest);
+  border-radius: 28px;
+  padding: 32px;
+  padding-top: 72px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+}
+
+.profile-avatar {
+  position: absolute;
+  top: -32px;
+  left: 32px;
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.candidate-name {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.candidate-role {
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.candidate-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.meta-item .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.skills-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(193,198,214,0.15);
+}
+
+.skills-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--on-surface-variant);
+  margin-bottom: 10px;
+}
+
+.skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 4px 12px;
+  background: var(--surface-container-high);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.context-card {
+  background: rgba(178,201,254,0.2);
+  border: 1px solid rgba(178,201,254,0.35);
+  border-radius: 28px;
+  padding: 28px;
+}
+
+.context-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.context-title .material-symbols-outlined {
+  color: var(--secondary);
+}
+
+.context-text {
+  font-size: 13px;
+  color: var(--on-secondary-container);
+  line-height: 1.6;
+}
+
+/* Main Panel */
+.main-panel {
+  background: var(--surface-container-lowest);
+  border-radius: 28px;
+  padding: 40px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(0,91,191,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.panel-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.panel-subtitle {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.cal-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-variant);
+  transition: background 0.2s;
+}
+.nav-btn:hover {
+  background: var(--surface-container);
+}
+
+/* Calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.day-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface-variant);
+  padding-bottom: 4px;
+}
+
+.day-btn {
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.day-btn:hover:not(.disabled) {
+  background: var(--surface-container-low);
+}
+.day-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.day-btn.selected {
+  background: linear-gradient(135deg, #005bbf 0%, #1a73e8 100%);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0,91,191,0.35);
+}
+
+/* Slots */
+.slots-section {
+  margin-bottom: 32px;
+}
+
+.slots-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.slot-btn {
+  padding: 14px 12px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: var(--surface-container-low);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s;
+}
+.slot-btn .slot-time {
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Manrope', sans-serif;
+}
+.slot-btn .slot-duration {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.slot-btn:hover {
+  border-color: rgba(0,91,191,0.2);
+}
+.slot-btn.selected {
+  border-color: var(--primary);
+  background: rgba(0,91,191,0.05);
+  color: var(--primary);
+}
+
+/* Meet Section */
+.meet-section {
+  background: var(--surface-container-low);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.meet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.meet-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meet-logo-wrap {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.meet-logo {
+  width: 24px;
+  height: 24px;
+}
+
+.meet-title {
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Manrope', sans-serif;
+}
+
+.autogen-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 13px;
+}
+.autogen-btn:hover {
+  text-decoration: underline;
+}
+
+.meet-input-wrap {
+  position: relative;
+}
+
+.meet-input-wrap input {
+  width: 100%;
+  border: none;
+  background: white;
+  border-radius: 12px;
+  padding: 14px 48px 14px 16px;
+  font-family: monospace;
+  font-size: 13px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+  outline: none;
+}
+
+.meet-input-wrap input:focus {
+  box-shadow: 0 0 0 2px rgba(0,91,191,0.15);
+}
+
+.copy-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+.copy-btn:hover {
+  color: var(--primary);
+}
+
+/* Panel Footer */
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 1px solid rgba(193,198,214,0.15);
+}
+
+.check-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 500;
+}
+.check-status .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  transition: background 0.2s;
+}
+.btn-cancel:hover {
+  background: var(--surface-container);
+}
+
+.btn-send {
+  padding: 10px 28px;
+  border-radius: 12px;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,91,191,0.35);
+  transition: transform 0.15s;
+}
+.btn-send:hover {
+  transform: scale(1.02);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: rgba(243,244,245,0.9);
+  backdrop-filter: blur(24px);
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 380px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.35s ease;
+  pointer-events: none;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.toast-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(158,67,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tertiary);
+  flex-shrink: 0;
+}
+
+.toast-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 6px;
+  font-family: 'Manrope', sans-serif;
+}
+
+.toast-text {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.toast-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatars {
+  display: flex;
+}
+
+.mini-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-left: -6px;
+}
+
+.mini-avatar:first-child {
+  margin-left: 0;
+}
+
+.shared-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--tertiary);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
