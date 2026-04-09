@@ -24,6 +24,16 @@ import tn.recruti.recruti_backend.model.User;
 import tn.recruti.recruti_backend.repository.CandidatureRepository;
 import tn.recruti.recruti_backend.repository.OfferRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
+import tn.recruti.recruti_backend.utils.CvScoringUtil;
+import tn.recruti.recruti_backend.utils.PdfExtractorUtil;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,29 +42,30 @@ public class CandidatureService {
     private final CandidatureRepository candidatureRepository;
     private final UserRepository userRepository;
     private final OfferRepository offerRepository;
-
+    private final PdfExtractorUtil PdfExtractorUtil;
+    private final CvScoringUtil cvScoringUtil;
     @Value("${file.upload-dir}")
     private String uploadDir;
 
     // ============ MAPPER ============
     private CandidatureResponseDTO toDTO(Candidature c) {
-    CandidatureResponseDTO dto = new CandidatureResponseDTO();
-    dto.setIdCandidature(c.getId());
-    dto.setIdOffre(c.getOffre() != null ? c.getOffre().getId() : null);
-    dto.setDatePostulation(c.getDatePostulation());
-    dto.setCvPath(c.getCvPath());
-    dto.setScoreCv(c.getScoreCv());
-    dto.setStatus(c.getStatus());
-    
-    // Ajouter les informations du candidat
-    if (c.getCandidat() != null) {
-        dto.setCandidatNom(c.getCandidat().getNom());
-        dto.setCandidatPrenom(c.getCandidat().getPrenom());
-        dto.setCandidatEmail(c.getCandidat().getEmail());
+        CandidatureResponseDTO dto = new CandidatureResponseDTO();
+        dto.setIdCandidature(c.getId());
+        dto.setIdOffre(c.getOffre() != null ? c.getOffre().getId() : null);
+        dto.setDatePostulation(c.getDatePostulation());
+        dto.setCvPath(c.getCvPath());
+        dto.setScoreCv(c.getScoreCv());
+        dto.setStatus(c.getStatus());
+
+        // Ajouter les informations du candidat
+        if (c.getCandidat() != null) {
+            dto.setCandidatNom(c.getCandidat().getNom());
+            dto.setCandidatPrenom(c.getCandidat().getPrenom());
+            dto.setCandidatEmail(c.getCandidat().getEmail());
+        }
+
+        return dto;
     }
-    
-    return dto;
-}
 
     // ============ POST ============
     public String postuler(Long candidatId, Long offreId, MultipartFile cvFile) throws IOException {
@@ -68,21 +79,28 @@ public class CandidatureService {
 
         Offer offre = offerRepository.findById(offreId)
                 .orElseThrow(() -> new RessourceNotFoundException("Offre introuvable avec l'id : " + offreId));
-
+        // 1. Save the CV file
         String fileName = "cv_" + candidatId + "_" + System.currentTimeMillis() + ".pdf";
         Path filePath = Paths.get(uploadDir, fileName);
         Files.createDirectories(filePath.getParent());
         Files.write(filePath, cvFile.getBytes());
-
+        // 2.extract text from PDF
+        String cvText = PdfExtractorUtil.extractText(cvFile);
+        // 3. Score the CV against the offer's keywords
+        // remove extra spaces
+        List<String> listTags = Arrays.stream(offre.getTags().split(","))
+                .map(String::trim)
+                .toList();
+        int score = (int) cvScoringUtil.score(cvText, listTags);
         Candidature candidature = new Candidature();
         candidature.setDatePostulation(LocalDate.now());
         candidature.setCvPath(fileName);
-        candidature.setScoreCv(0);
+        candidature.setScoreCv(score);
         candidature.setStatus(statuAnalyse.INITIAL);
         candidature.setCandidat(candidat);
         candidature.setOffre(offre);
-
         candidatureRepository.save(candidature);
+        System.out.println("Candidature of score " + score + ": " + candidature.getScoreCv());
         return "Candidature ajoutée avec succès.";
     }
 
