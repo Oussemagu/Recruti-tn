@@ -29,6 +29,7 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - tokens_data:/app/tokens 
     networks:
       - app-network
     healthcheck:
@@ -66,3 +67,4 @@ networks:
 volumes:
   mysql_data:
   uploads_data:   
+  tokens_data: 
