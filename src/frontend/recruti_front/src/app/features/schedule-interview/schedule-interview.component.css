@@ -564,3 +564,81 @@
 .toast-close:hover {
   opacity: 1;
 }
+/* Google Calendar not connected banner */
+.google-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+ 
+.google-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+ 
+.banner-meet-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+ 
+.banner-title {
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Manrope', sans-serif;
+  color: #7a5c00;
+  margin-bottom: 2px;
+}
+ 
+.banner-subtitle {
+  font-size: 12px;
+  color: #9a7500;
+  line-height: 1.4;
+}
+ 
+.banner-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #005bbf 0%, #1a73e8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+ 
+  .material-symbols-outlined { font-size: 16px; }
+ 
+  &:hover:not(:disabled) { transform: scale(1.02); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+ 
+/* Info banner shown after opening consent tab */
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8f4fd;
+  border: 1px solid #90caf9;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #0d47a1;
+ 
+  .material-symbols-outlined { font-size: 18px; color: #1976d2; }
+  p { margin: 0; }
+}
+ 
