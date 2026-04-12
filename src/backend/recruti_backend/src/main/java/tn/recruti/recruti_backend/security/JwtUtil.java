@@ -14,7 +14,8 @@ import java.util.Date;
  * - Extraction de l'email depuis un token
  * - Validation d'un token (signature + expiration)
  *
- * Les valeurs jwt.secret et jwt.expiration sont lues depuis application.properties.
+ * Les valeurs jwt.secret et jwt.expiration sont lues depuis
+ * application.properties.
  */
 @Component
 public class JwtUtil {
@@ -45,13 +46,13 @@ public class JwtUtil {
      */
     public String generateToken(String email, Long id, String role) {
         return Jwts.builder()
-                .subject(email)                                           // payload : email de l'utilisateur
-                .claim("id", id)   
-                .claim("role",role)
-                .issuedAt(new Date())                                     // date de création du token
+                .subject(email) // payload : email de l'utilisateur
+                .claim("id", id)
+                .claim("role", role)
+                .issuedAt(new Date()) // date de création du token
                 .expiration(new Date(System.currentTimeMillis() + expiration)) // date d'expiration
-                .signWith(getKey())                                       // signature HMAC-SHA256
-                .compact();                                               // sérialisation en String
+                .signWith(getKey()) // signature HMAC-SHA256
+                .compact(); // sérialisation en String
     }
 
     /**
@@ -63,11 +64,28 @@ public class JwtUtil {
      */
     public String extractEmail(String token) {
         return Jwts.parser()
-                .verifyWith(getKey())       // vérification de la signature
+                .verifyWith(getKey()) // vérification de la signature
                 .build()
-                .parseSignedClaims(token)  // parsing du token
+                .parseSignedClaims(token) // parsing du token
                 .getPayload()
-                .getSubject();             // récupération du champ "subject" = email
+                .getSubject(); // récupération du champ "subject" = email
+    }
+
+    /**
+     * Extrait l'ID de l'utilisateur depuis le payload du token JWT.
+     * Utilisé pour identifier le recruiter dans Google Calendar flow.
+     *
+     * @param token token JWT valide
+     * @return ID du recruiter sous forme de String
+     */
+    public String extractId(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("id", Long.class) // ← reads the "id" claim you set in generateToken()
+                .toString();
     }
 
     /**
@@ -81,9 +99,9 @@ public class JwtUtil {
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token); // lève une exception si invalide ou expiré
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token); // lève une exception si invalide ou expiré
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             // Token falsifié, expiré, malformé ou vide
