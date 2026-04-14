@@ -6,4 +6,5 @@ export interface Candidature {
   datePostulation: string;
   scoreCv: number;
   status: string;
+  invitedToQuiz?: boolean;
 }

@@ -44,4 +44,8 @@ export class CandidatureService {
     const fileName = cvPath.split('/').pop();
     return `${environment.apiUrl}/api/candidatures/cv/${fileName}`;
   }
+
+  inviteToQuiz(candidatureId: number): Observable<string> {
+    return this.http.patch(`${this.baseUrl}/${candidatureId}/invite-to-quiz`, {}, { responseType: 'text' });
+  }
 }

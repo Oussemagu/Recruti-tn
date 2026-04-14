@@ -1,14 +1,24 @@
 package tn.recruti.recruti_backend.model;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tn.recruti.recruti_backend.enums.statuAnalyse;  
-
-import java.time.LocalDate;
+import tn.recruti.recruti_backend.enums.statuAnalyse;
 @Entity
 @Data
 @NoArgsConstructor
@@ -32,6 +42,9 @@ public class Candidature {
     @NotNull
     @Enumerated(EnumType.STRING)
    private statuAnalyse status;// commence par majuscule par convention
+
+    @Column(name = "invited_to_quiz")
+    private boolean invitedToQuiz = false;
 
     @ManyToOne
     @JoinColumn(name = "candidat_id")
