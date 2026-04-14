@@ -381,19 +381,30 @@ export class MyOffersComponent implements OnInit {
       return;
     }
 
-    // Check if there is a quiz for this offer first
+    // First check if there is a quiz for this offer
     this.quizService.getQuizByOffer(this.selectedOffer.id).subscribe({
       next: (quiz) => {
-        // Quiz exists, show success message
-        this.success.set(`Invitation envoyée à ${candidature.candidatPrenom} ${candidature.candidatNom} pour le quiz !`);
-        setTimeout(() => this.success.set(null), 3000);
-        // TODO: Implement actual invitation logic (email, notification, etc.)
+        // Quiz exists, now invite the candidate by updating their candidature in the database
+        this.candidatureService.inviteToQuiz(candidature.idCandidature).subscribe({
+          next: () => {
+            // Mark as invited locally
+            candidature.invitedToQuiz = true;
+            
+            // Show success message
+            this.success.set(`Invitation envoyée à ${candidature.candidatPrenom} ${candidature.candidatNom} pour le quiz !`);
+            setTimeout(() => this.success.set(null), 3000);
+          },
+          error: (err) => {
+            this.error.set('Erreur lors de l\'invitation au quiz');
+            console.error(err);
+          }
+        });
       },
       error: (err) => {
         if (err.status === 404) {
           this.error.set('Aucun quiz n\'est associé à cette offre. Veuillez en créer un d\'abord.');
         } else {
-          this.error.set('Erreur lors de l\'invitation au quiz');
+          this.error.set('Erreur lors de la vérification du quiz');
         }
       }
     });

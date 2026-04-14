@@ -1,8 +1,19 @@
 package tn.recruti.recruti_backend.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import tn.recruti.recruti_backend.dto.QuizCreateDto;
 import tn.recruti.recruti_backend.dto.QuizSubmissionDto;
 import tn.recruti.recruti_backend.model.Offer;
@@ -13,11 +24,6 @@ import tn.recruti.recruti_backend.repository.OfferRepository;
 import tn.recruti.recruti_backend.repository.PassageRepository;
 import tn.recruti.recruti_backend.repository.QuizRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class QuizController {
@@ -178,4 +184,4 @@ public class QuizController {
     public static class ErrorDto {
         private String message;
     }
-
+}

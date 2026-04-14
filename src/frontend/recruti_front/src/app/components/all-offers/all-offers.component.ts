@@ -107,6 +107,11 @@ export class AllOffersComponent implements OnInit {
     return this.candidatures.some(c => c.idOffre === offerId);
   }
 
+  hasBeenInvitedToQuiz(offerId: number): boolean {
+    const candidature = this.candidatures.find(c => c.idOffre === offerId);
+    return candidature ? candidature.invitedToQuiz === true : false;
+  }
+
   private getCandidatureByOffre(offerId: number): Candidature | undefined {
     return this.candidatures.find(c => c.idOffre === offerId);
   }
@@ -329,6 +334,7 @@ export class AllOffersComponent implements OnInit {
 
   // ── Modal : Prendre le quiz ───────────────────────────
   ouvrirQuizModal(offer: Offer): void {
+    if (!offer.id) return;
     this.selectedQuizOffer = offer;
     this.quizLoading = true;
     this.quizAnswers = [];
@@ -399,6 +405,12 @@ export class AllOffersComponent implements OnInit {
     this.errorMessage = '';
 
     // Get the quiz first to get its ID
+    if (!this.selectedQuizOffer?.id) {
+      this.errorMessage = 'Erreur: Offre non sélectionnée';
+      this.quizSubmitting = false;
+      return;
+    }
+
     this.quizService.getQuizByOffer(this.selectedQuizOffer.id).subscribe({
       next: (quiz) => {
         const payload = {

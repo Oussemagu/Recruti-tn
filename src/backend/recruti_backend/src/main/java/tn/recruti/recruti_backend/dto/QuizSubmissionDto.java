@@ -1,7 +1,8 @@
 package tn.recruti.recruti_backend.dto;
 
-import lombok.Data;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class QuizSubmissionDto {
