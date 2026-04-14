@@ -1,6 +1,9 @@
 package tn.recruti.recruti_backend.controller;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -8,17 +11,22 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
 import tn.recruti.recruti_backend.dto.CandidatureRequestDTO;
 import tn.recruti.recruti_backend.dto.CandidatureResponseDTO;
 import tn.recruti.recruti_backend.dto.CandidatureUpdateDTO;
 import tn.recruti.recruti_backend.enums.statuAnalyse;
 import tn.recruti.recruti_backend.service.CandidatureService;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/candidatures")
@@ -75,6 +83,11 @@ public class CandidatureController {
             @RequestParam statuAnalyse status
     ) {
         return ResponseEntity.ok(candidatureService.updateStatus(id, status));
+    }
+
+    @PatchMapping("/{id}/invite-to-quiz")
+    public ResponseEntity<String> inviteToQuiz(@PathVariable Long id) {
+        return ResponseEntity.ok(candidatureService.inviteToQuiz(id));
     }
 
     @DeleteMapping("/{id}")
