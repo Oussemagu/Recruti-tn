@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Quiz, QuizCreateRequest } from '../models/quiz.model';
+import { Quiz, QuizCreateRequest, QuizSubmissionRequest, QuizResult } from '../models/quiz.model';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +26,9 @@ export class QuizService {
 
   deleteQuiz(quizId: number): Observable<Quiz> {
     return this.http.delete<Quiz>(`${this.baseUrl}/deleteQuiz/${quizId}`);
+  }
+
+  submitQuiz(payload: QuizSubmissionRequest): Observable<QuizResult> {
+    return this.http.post<QuizResult>(`${this.baseUrl}/submitQuiz`, payload);
   }
 }
