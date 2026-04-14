@@ -9,3 +9,16 @@ export interface QuizCreateRequest {
   vraiesReponses: string;
   offerId: number;
 }
+
+export interface QuizSubmissionRequest {
+  quizId: number;
+  candidatId: number;
+  answers: string[];
+}
+
+export interface QuizResult {
+  passageId: number;
+  score: number;
+  totalQuestions: number;
+  datePassage: string;
+}
