@@ -1,14 +1,25 @@
 package tn.recruti.recruti_backend.model;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "offres")
@@ -39,11 +50,11 @@ public class Offer {
     private User recruteur;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonManagedReference("1")
+    @JsonIgnore
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
     @OneToMany(mappedBy = "offre",cascade = CascadeType.ALL)
-    @JsonManagedReference("2")
+    @JsonIgnore
     private List<Candidature> candidatures;
 }
