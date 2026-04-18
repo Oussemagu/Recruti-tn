@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -8,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { OfferService } from '../../services/offer.service';
 import { CandidatureService } from '../../services/candidature.service';
+import { QuizService } from '../../services/quiz.service';
 import { AuthService } from '../../core/services/auth';
 import { Offer } from '../../models/offer.model';
 import { Candidature } from '../../models/candidature.model';
@@ -15,7 +17,7 @@ import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-all-offers',
-  imports: [CommonModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, DatePipe],
   templateUrl: './all-offers.component.html',
   styleUrl: './all-offers.component.css'
 })
@@ -69,9 +71,21 @@ export class AllOffersComponent implements OnInit {
   selectedCandidature: Candidature | null = null;
   cvUrl: SafeResourceUrl | null = null;
 
+  // ── Modal : prendre le quiz ────────────────────────────
+  showQuizModal = false;
+  selectedQuizOffer: Offer | null = null;
+  quizQuestions: Array<{ question: string; choix: string[] }> = [];
+  quizAnswers: string[] = [];
+  quizLoading = false;
+  quizSubmitting = false;
+  quizResult: any = null;
+  showQuizResult = false;
+  hasAlreadyTakenQuiz = false;
+
   constructor(
     private readonly offerService: OfferService,
-    public  readonly candidatureService: CandidatureService
+    public  readonly candidatureService: CandidatureService,
+    private readonly quizService: QuizService
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +106,11 @@ export class AllOffersComponent implements OnInit {
 
   hasApplied(offerId: number): boolean {
     return this.candidatures.some(c => c.idOffre === offerId);
+  }
+
+  hasBeenInvitedToQuiz(offerId: number): boolean {
+    const candidature = this.candidatures.find(c => c.idOffre === offerId);
+    return candidature ? candidature.invitedToQuiz === true : false;
   }
 
   private getCandidatureByOffre(offerId: number): Candidature | undefined {
@@ -312,6 +331,114 @@ export class AllOffersComponent implements OnInit {
     this.showDetailsModal    = false;
     this.selectedCandidature = null;
     this.cvUrl               = null;
+  }
+
+  // ── Modal : Prendre le quiz ───────────────────────────
+  ouvrirQuizModal(offer: Offer): void {
+    if (!offer.id) return;
+    this.selectedQuizOffer = offer;
+    this.quizLoading = true;
+    this.quizAnswers = [];
+    this.quizResult = null;
+    this.showQuizResult = false;
+    this.showQuizModal = true;
+    this.chargerQuiz(offer.id);
+  }
+
+  fermerQuizModal(): void {
+    this.showQuizModal = false;
+    this.selectedQuizOffer = null;
+    this.quizQuestions = [];
+    this.quizAnswers = [];
+    this.quizResult = null;
+    this.showQuizResult = false;
+  }
+
+  chargerQuiz(offerId: number): void {
+    this.quizLoading = true;
+    this.errorMessage = '';
+
+    this.quizService.getQuizByOffer(offerId).subscribe({
+      next: (quiz) => {
+        try {
+          const contenu = JSON.parse(quiz.contenu ?? '[]');
+          this.quizQuestions = Array.isArray(contenu) ? contenu : [];
+          
+          // Initialize answers array
+          this.quizAnswers = new Array(this.quizQuestions.length).fill('');
+          
+          this.quizLoading = false;
+        } catch (e) {
+          this.errorMessage = 'Erreur lors du chargement du quiz';
+          this.quizLoading = false;
+        }
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          this.errorMessage = 'Aucun quiz n\'est associé à cette offre';
+        } else {
+          this.errorMessage = 'Erreur lors du chargement du quiz';
+        }
+        this.quizLoading = false;
+      }
+    });
+  }
+
+  soumettreQuiz(): void {
+    if (!this.selectedQuizOffer) {
+      this.errorMessage = 'Erreur: Offre non sélectionnée';
+      return;
+    }
+
+    const candidatId = this.getCandidatId();
+    if (!candidatId) {
+      this.errorMessage = 'Erreur: ID candidat non trouvé';
+      return;
+    }
+
+    // Check that all questions are answered
+    if (this.quizAnswers.some(answer => !answer || answer.trim() === '')) {
+      this.errorMessage = 'Veuillez répondre à toutes les questions';
+      return;
+    }
+
+    this.quizSubmitting = true;
+    this.errorMessage = '';
+
+    // Get the quiz first to get its ID
+    if (!this.selectedQuizOffer?.id) {
+      this.errorMessage = 'Erreur: Offre non sélectionnée';
+      this.quizSubmitting = false;
+      return;
+    }
+
+    this.quizService.getQuizByOffer(this.selectedQuizOffer.id).subscribe({
+      next: (quiz) => {
+        const payload = {
+          quizId: quiz.id,
+          candidatId: candidatId,
+          answers: this.quizAnswers
+        };
+
+        this.quizService.submitQuiz(payload).subscribe({
+          next: (result) => {
+            this.quizResult = result;
+            this.showQuizResult = true;
+            this.quizSubmitting = false;
+            // Reload data after submission
+            setTimeout(() => this.loadData(), 2000);
+          },
+          error: (err) => {
+            this.errorMessage = err.error?.message || 'Erreur lors de la soumission du quiz';
+            this.quizSubmitting = false;
+          }
+        });
+      },
+      error: (err) => {
+        this.errorMessage = 'Erreur lors du chargement du quiz';
+        this.quizSubmitting = false;
+      }
+    });
   }
 
   // ── Navigation ────────────────────────────────────────

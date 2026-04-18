@@ -16,4 +16,6 @@ public class CandidatureResponseDTO {
     private String candidatNom;      // nom du candidat
     private String candidatPrenom;   // prenom du candidat
     private String candidatEmail;    // email du candidat
+    private boolean invitedToQuiz;   // indique si le candidat a été invité au quiz
+    private Integer quizScore;       // score du quiz si completé (null si pas encore passé)
 }

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,17 +24,10 @@ import tn.recruti.recruti_backend.model.Offer;
 import tn.recruti.recruti_backend.model.User;
 import tn.recruti.recruti_backend.repository.CandidatureRepository;
 import tn.recruti.recruti_backend.repository.OfferRepository;
+import tn.recruti.recruti_backend.repository.PassageRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
 import tn.recruti.recruti_backend.utils.CvScoringUtil;
 import tn.recruti.recruti_backend.utils.PdfExtractorUtil;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +36,7 @@ public class CandidatureService {
     private final CandidatureRepository candidatureRepository;
     private final UserRepository userRepository;
     private final OfferRepository offerRepository;
+    private final PassageRepository passageRepository;
     private final PdfExtractorUtil PdfExtractorUtil;
     private final CvScoringUtil cvScoringUtil;
     @Value("${file.upload-dir}")
@@ -56,6 +51,18 @@ public class CandidatureService {
         dto.setCvPath(c.getCvPath());
         dto.setScoreCv(c.getScoreCv());
         dto.setStatus(c.getStatus());
+        dto.setInvitedToQuiz(c.isInvitedToQuiz());
+
+        // Fetch quiz score if available
+        if (c.getOffre() != null && c.getOffre().getQuiz() != null && c.getCandidat() != null) {
+            var passage = passageRepository.findLatestPassageByCandidatAndQuiz(
+                c.getCandidat().getId(), 
+                c.getOffre().getQuiz().getId()
+            );
+            if (passage.isPresent()) {
+                dto.setQuizScore(passage.get().getScore());
+            }
+        }
 
         // Ajouter les informations du candidat
         if (c.getCandidat() != null) {
@@ -164,5 +171,13 @@ public class CandidatureService {
         c.setStatus(newStatus);
         candidatureRepository.save(c);
         return "Statut modifié avec succès.";
+    }
+
+    public String inviteToQuiz(Long id) {
+        Candidature c = candidatureRepository.findById(id)
+                .orElseThrow(() -> new RessourceNotFoundException("Candidature introuvable avec l'id : " + id));
+        c.setInvitedToQuiz(true);
+        candidatureRepository.save(c);
+        return "Invitation au quiz envoyée avec succès.";
     }
 }
