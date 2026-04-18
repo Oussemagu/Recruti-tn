@@ -6,7 +6,7 @@ import { OfferService,OfferResponse, OfferRequest  } from '../../services/offer.
 import { CandidatureService } from '../../services/candidature.service';
 import { PagedResponse } from '../../models/paged-response.model';
 import { QuizService } from '../../services/quiz.service';
-import { QuizCreateRequest } from '../../models/quiz.model';
+import { QuizCreateRequest, PassageWithCandidate } from '../../models/quiz.model';
 
 type QuizQuestionForm = {
   question: string;
@@ -41,10 +41,15 @@ export class MyOffersComponent implements OnInit {
   showDeleteModal = signal<boolean>(false);
   showCandidaturesModal = signal<boolean>(false);
   showQuizModal = signal<boolean>(false);
+  showInterviewsModal = signal<boolean>(false);
 
   // Candidatures
   candidatures = signal<any[]>([]);
   candidaturesLoading = signal<boolean>(false);
+
+  // Interviews
+  passages = signal<PassageWithCandidate[]>([]);
+  passagesLoading = signal<boolean>(false);
 
   // Quiz
   quizLoading = signal<boolean>(false);
@@ -148,9 +153,11 @@ export class MyOffersComponent implements OnInit {
     this.showDeleteModal.set(false);
     this.showCandidaturesModal.set(false);
     this.showQuizModal.set(false);
+    this.showInterviewsModal.set(false);
     this.selectedOffer = null;
     this.resetForm();
     this.resetQuizForm();
+    this.passages.set([]);
   }
 
   /**
@@ -556,5 +563,106 @@ export class MyOffersComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  /**
+   * Ouvre le modal pour voir les candidats qui ont passé le quiz
+   */
+  openInterviewsModal(offer: OfferResponse): void {
+    this.selectedOffer = offer;
+    this.passagesLoading.set(true);
+    this.passages.set([]);
+    this.showInterviewsModal.set(true);
+    this.loadInterviews(offer.id);
+  }
+
+  /**
+   * Charge les passages (quiz attempts) pour une offre
+   */
+  loadInterviews(offerId: number): void {
+    this.passagesLoading.set(true);
+    this.error.set(null);
+
+    // First get the quiz for this offer
+    this.quizService.getQuizByOffer(offerId).subscribe({
+      next: (quiz) => {
+        console.log('Quiz retrieved:', quiz);
+        // Then get all passages for this quiz
+        this.quizService.getQuizPassages(quiz.id).subscribe({
+          next: (passages) => {
+            console.log('Passages retrieved:', passages);
+            this.passages.set(passages);
+            this.passagesLoading.set(false);
+          },
+          error: (err) => {
+            console.error('Erreur lors du chargement des passages:', err);
+            console.error('Error details:', err.error);
+            this.passages.set([]);
+            this.passagesLoading.set(false);
+            this.error.set('Erreur lors du chargement des passages: ' + (err.error?.message || err.message || 'Erreur inconnue'));
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement du quiz:', err);
+        console.error('Error details:', err.error);
+        if (err.status === 404) {
+          this.error.set('Aucun quiz n\'est associé à cette offre');
+        } else {
+          this.error.set('Erreur lors du chargement des interviews: ' + (err.error?.message || err.message || 'Erreur inconnue'));
+        }
+        this.passages.set([]);
+        this.passagesLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Visualise le CV d'un candidat dans une nouvelle fenêtre
+   */
+  viewCandidateCv(passage: PassageWithCandidate): void {
+    if (!this.selectedOffer) {
+      this.error.set('Erreur: Offre non sélectionnée');
+      return;
+    }
+
+    // Fetch the candidatures for this offer to get the CV path
+    this.candidatureService.getCandidaturesByOffer(this.selectedOffer.id).subscribe({
+      next: (candidatures: any[]) => {
+        console.log('Candidatures retrieved:', candidatures);
+        console.log('Looking for candidate email:', passage.candidatEmail);
+        
+        // Find the candidature for this specific candidate by email
+        const candidature = candidatures.find(c => c.candidatEmail === passage.candidatEmail);
+        
+        console.log('Found candidature:', candidature);
+        
+        if (candidature && candidature.cvPath) {
+          // Use the service method to construct the proper CV URL
+          const cvUrl = this.candidatureService.getCvUrl(candidature.cvPath);
+          console.log('Opening CV from URL:', cvUrl);
+          window.open(cvUrl, '_blank');
+        } else {
+          console.log('No CV path found. Candidature:', candidature);
+          this.error.set('CV non disponible pour ce candidat');
+          setTimeout(() => this.error.set(null), 3000);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading candidatures:', err);
+        this.error.set('Erreur lors du chargement du CV');
+        setTimeout(() => this.error.set(null), 3000);
+      }
+    });
+  }
+
+  /**
+   * Invite un candidat à un entretien
+   */
+  inviteToInterview(passage: PassageWithCandidate): void {
+    // This would typically open a dialog or send an email invite
+    // For now, we'll show a success message
+    this.success.set(`Invitation à un entretien envoyée à ${passage.candidatPrenom} ${passage.candidatNom} !`);
+    setTimeout(() => this.success.set(null), 3000);
   }
 }
