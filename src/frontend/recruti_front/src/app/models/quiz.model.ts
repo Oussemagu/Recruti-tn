@@ -22,3 +22,14 @@ export interface QuizResult {
   totalQuestions: number;
   datePassage: string;
 }
+
+export interface PassageWithCandidate {
+  passageId: number;
+  candidatId: number;
+  candidatNom: string;
+  candidatPrenom: string;
+  candidatEmail: string;
+  score: number;
+  datePassage: string;
+  cvPath?: string;
+}

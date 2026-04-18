@@ -80,6 +80,7 @@ export class AllOffersComponent implements OnInit {
   quizSubmitting = false;
   quizResult: any = null;
   showQuizResult = false;
+  hasAlreadyTakenQuiz = false;
 
   constructor(
     private readonly offerService: OfferService,
