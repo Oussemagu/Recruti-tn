@@ -56,9 +56,8 @@ public class CandidatureService {
         // Fetch quiz score if available
         if (c.getOffre() != null && c.getOffre().getQuiz() != null && c.getCandidat() != null) {
             var passage = passageRepository.findLatestPassageByCandidatAndQuiz(
-                c.getCandidat().getId(), 
-                c.getOffre().getQuiz().getId()
-            );
+                    c.getCandidat().getId(),
+                    c.getOffre().getQuiz().getId());
             if (passage.isPresent()) {
                 dto.setQuizScore(passage.get().getScore());
             }
@@ -133,6 +132,7 @@ public class CandidatureService {
     }
 
     // ============ PATCH ============
+    // ============ PATCH ============
     public CandidatureResponseDTO update(Long id, CandidatureUpdateDTO dto) throws IOException {
         Candidature c = candidatureRepository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Candidature introuvable avec l'id : " + id));
@@ -143,9 +143,14 @@ public class CandidatureService {
             Files.createDirectories(filePath.getParent());
             Files.write(filePath, dto.getCv().getBytes());
             c.setCvPath(fileName);
-        }
 
-        if (dto.getScoreCv() != null) {
+            String cvText = PdfExtractorUtil.extractText(dto.getCv());
+            List<String> listTags = Arrays.stream(c.getOffre().getTags().split(","))
+                    .map(String::trim)
+                    .toList();
+            int newScore = (int) cvScoringUtil.score(cvText, listTags);
+            c.setScoreCv(newScore);
+        } else if (dto.getScoreCv() != null) {
             c.setScoreCv(dto.getScoreCv());
         }
 

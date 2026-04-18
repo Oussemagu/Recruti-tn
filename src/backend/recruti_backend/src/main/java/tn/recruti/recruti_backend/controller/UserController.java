@@ -1,4 +1,5 @@
 package tn.recruti.recruti_backend.controller;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import tn.recruti.recruti_backend.Exception.RessourceNotFoundException;
 import tn.recruti.recruti_backend.dto.UpdateUserRequest;
 import tn.recruti.recruti_backend.dto.UserDTO;
 import tn.recruti.recruti_backend.dto.VerifyPasswordRequest;
@@ -88,7 +91,8 @@ public class UserController {
 
     // ─── DELETE /api/users/profile ───────────────────────────────────────────────
     /**
-     * Permanently delete the currently authenticated user's account and all associated data.
+     * Permanently delete the currently authenticated user's account and all
+     * associated data.
      * Accessible to all authenticated users (for their own account).
      */
     @DeleteMapping("/profile")
@@ -96,6 +100,13 @@ public class UserController {
     public ResponseEntity<Void> deleteCurrentUserAccount() {
         userService.deleteCurrentUserAccount();
         return ResponseEntity.noContent().build();
+    }
+
+    // GET /api/users/by-email?email=...
+    @GetMapping("/by-email")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     // ─── DELETE /api/users/{id} ──────────────────────────────────────────────────
@@ -113,6 +124,7 @@ public class UserController {
     // ─── POST /api/users/profile/verify-password ─────────────────────────────────
     /**
      * Verify the current user's password before account deletion.
+     * 
      * @param request VerifyPasswordRequest containing the plain text password
      * @return JSON object with "valid" boolean field
      */
@@ -131,7 +143,8 @@ public class UserController {
     /**
      * Verify a user's password before account deletion.
      * Only admins or the user themselves can verify a password.
-     * @param id User ID
+     * 
+     * @param id      User ID
      * @param request VerifyPasswordRequest containing the plain text password
      * @return JSON object with "valid" boolean field
      */
@@ -146,4 +159,5 @@ public class UserController {
         }
         return ResponseEntity.ok(Map.of("valid", true));
     }
+
 }

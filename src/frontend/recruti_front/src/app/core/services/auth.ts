@@ -131,4 +131,7 @@ isRecruteur(): boolean {
 isAuthenticated(): boolean {
   return !!this.getCurrentUser()?.token;
 }
+getUserByEmail(email: string): Observable<User> {
+  return this.http.get<User>(`${this.USERS_API}/by-email?email=${email}`);
+}
 }

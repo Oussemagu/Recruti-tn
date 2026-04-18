@@ -461,12 +461,23 @@
   font-size: 14px;
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(0,91,191,0.35);
-  transition: transform 0.15s;
+  /*transition: transform 0.15s;*/
+  transition: all 0.2s ease;
 }
 .btn-send:hover {
   transform: scale(1.02);
 }
-
+/* 3. Handle the 'Disabled' look (when no date is selected) */
+.btn-send:disabled {
+  background: #ccc !important; /* Soft gray when disabled */
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.btn-send:hover:not(:disabled) {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
 /* Toast */
 .toast {
   position: fixed;
@@ -641,4 +652,6 @@
   .material-symbols-outlined { font-size: 18px; color: #1976d2; }
   p { margin: 0; }
 }
- 
+.signature-gradient {
+  background: linear-gradient(135deg, #005bbf 0%, #1a73e8 100%) !important;
+}

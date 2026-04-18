@@ -48,15 +48,21 @@
         <div class="profile-body">
           <h3 class="candidate-name">{{ candidate.name }}</h3>
           <p class="candidate-role">{{ candidate.role }}</p>
+
           <div class="candidate-meta">
+             <div class="meta-item">
+              <span class="material-symbols-outlined">email</span>
+              <span>{{ candidate.email }}</span>
+            </div>
             <div class="meta-item">
               <span class="material-symbols-outlined">location_on</span>
               <span>{{ candidate.location }}</span>
             </div>
             <div class="meta-item">
-              <span class="material-symbols-outlined">work_history</span>
-              <span>{{ candidate.experience }}</span>
+              <span class="material-symbols-outlined">star</span>
+              <span> Quiz score : {{ candidate.score }} %</span>
             </div>
+
           </div>
           <div class="skills-section">
             <span class="skills-label">Skills Highlight</span>
@@ -73,6 +79,7 @@
           Interview Context
         </h4>
         <p class="context-text">{{ candidate.interviewContext }}</p>
+        <p class="context-text">{{ candidate.jobOfferDescription }}</p>
       </div>
     </div>
 
@@ -190,16 +197,9 @@
   <div class="toast-body">
     <h5 class="toast-title">Invitation Ready</h5>
     <p class="toast-text">
-      An email with the Google Meet link and calendar attachment will be sent to
-      <strong>{{ candidate.email }}</strong> once you confirm.
+      An email with the Google Meet link and calendar  was  sent to
+      <strong>{{ candidate.email }}</strong>.
     </p>
-    <div class="toast-meta">
-      <div class="avatars">
-        <img src="https://i.pravatar.cc/24?img=12" class="mini-avatar" />
-        <img src="https://i.pravatar.cc/24?img=7"  class="mini-avatar" />
-      </div>
-      <span class="shared-label">Shared invite</span>
-    </div>
   </div>
   <button class="toast-close" (click)="showToast = false">
     <span class="material-symbols-outlined">close</span>

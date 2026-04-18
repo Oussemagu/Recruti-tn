@@ -7,7 +7,7 @@ import { CandidatureService } from '../../services/candidature.service';
 import { PagedResponse } from '../../models/paged-response.model';
 import { QuizService } from '../../services/quiz.service';
 import { QuizCreateRequest, PassageWithCandidate } from '../../models/quiz.model';
-
+import { Router } from '@angular/router';
 type QuizQuestionForm = {
   question: string;
   choix: string[];
@@ -73,7 +73,8 @@ export class MyOffersComponent implements OnInit {
     private authService: AuthService,
     private offerService: OfferService,
     private candidatureService: CandidatureService,
-    private quizService: QuizService
+    private quizService: QuizService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -660,9 +661,19 @@ export class MyOffersComponent implements OnInit {
    * Invite un candidat à un entretien
    */
   inviteToInterview(passage: PassageWithCandidate): void {
-    // This would typically open a dialog or send an email invite
-    // For now, we'll show a success message
-    this.success.set(`Invitation à un entretien envoyée à ${passage.candidatPrenom} ${passage.candidatNom} !`);
-    setTimeout(() => this.success.set(null), 3000);
-  }
+  const offerTitle = this.selectedOffer?.titre;
+  const offerDescription = this.selectedOffer?.description;
+  const offerId    = this.selectedOffer?.id;
+  this.closeModals();
+  this.router.navigate(['/schedule-interview'], {
+    state: {
+      candidateName:  `${passage.candidatPrenom} ${passage.candidatNom}`,
+      candidateEmail: passage.candidatEmail,
+      candidateScore:          passage.score,
+      offerId:        offerId,
+      offerTitle:     offerTitle,
+      offerDescription: offerDescription
+    }
+  });
+}
 }
