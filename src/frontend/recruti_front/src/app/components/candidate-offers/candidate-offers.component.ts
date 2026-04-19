@@ -36,8 +36,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class CandidateOffersComponent implements OnInit {  // ← implémenter OnInit
   auth = inject(AuthService);
   private router = inject(Router);
-
-  showProfileDropdown = false;
+   showProfileDropdown = false;
   showEditModal = signal(false);
   isSubmitting = signal(false);
   errorMessage = signal('');
@@ -54,7 +53,9 @@ export class CandidateOffersComponent implements OnInit {  // ← implémenter O
   isRecruteur(): boolean {
     return this.auth.isRecruteur();
   }
-
+  isAdmin(): boolean {
+    return this.auth.isAdmin();
+  }
   toggleProfileDropdown(): void {
     this.showProfileDropdown = !this.showProfileDropdown;
   }

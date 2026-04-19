@@ -3,20 +3,20 @@
   <!-- ── Hero ─────────────────────────────────────────── -->
   <div class="hero">
     <div class="hero-left">
-      <p class="hero-eyebrow">Tableau de bord</p>
-      <h1 class="hero-title">Offres d'<em>emploi</em></h1>
-      <p class="hero-sub">Découvrez les opportunités disponibles</p>
+      <p class="hero-eyebrow">Dashboard</p>
+      <h1 class="hero-title">Job <em>Offers</em></h1>
+      <p class="hero-sub">Discover available opportunities</p>
     </div>
 
     <div class="hero-stat-pill" *ngIf="isCandidat()">
       <div class="hstat">
         <span class="hstat-n">{{ totalOffers }}</span>
-        <span class="hstat-l">Offres</span>
+        <span class="hstat-l">Offers</span>
       </div>
       <div class="hstat-sep"></div>
       <div class="hstat hstat--accent">
         <span class="hstat-n">{{ candidatures.length }}</span>
-        <span class="hstat-l">Candidatures</span>
+        <span class="hstat-l">Applications</span>
       </div>
     </div>
   </div>
@@ -32,7 +32,7 @@
       <input
         type="text"
         class="search-input"
-        placeholder="Rechercher une offre..."
+        placeholder="Search for a job offer..."
         [formControl]="filterForm.controls['titre']"
         (input)="applyFilters()"
       />
@@ -40,10 +40,10 @@
         *ngIf="filterForm.value.titre"
         class="search-clear"
         (click)="resetFilters()"
-        title="Effacer">✕</button>
+        title="Clear">✕</button>
     </div>
     <span class="search-hint" *ngIf="filterForm.value.titre">
-      {{ offers.length }} résultat(s)
+      {{ offers.length }} result(s)
     </span>
   </div>
 
@@ -533,7 +533,7 @@
         <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
         <h3 style="margin: 0 0 1rem; color: #1F2937;">Quiz soumis avec succès!</h3>
         <p style="color: #6B7280; margin-bottom: 2rem;">Voici vos résultats:</p>
-        
+
         <div style="background: #EFF6FF; border: 2px solid #BFDBFE; border-radius: 0.5rem; padding: 2rem; margin-bottom: 1.5rem;">
           <div style="font-size: 2.5rem; font-weight: 700; color: #1E40AF; margin-bottom: 0.5rem;">
             {{ quizResult.score }}%

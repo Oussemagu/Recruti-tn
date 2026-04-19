@@ -2,19 +2,19 @@
   <div class="mb-6 flex flex-col gap-4 rounded-xl bg-white p-4 shadow sm:flex-row sm:items-end sm:justify-between">
     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <div>
-        <label class="mb-1 block text-sm font-medium text-slate-700">Recherche par titre</label>
+        <label class="mb-1 block text-sm font-medium text-slate-700">Search by title</label>
         <input
           type="text"
           [(ngModel)]="searchTitre"
           (keyup.enter)="applyFilters()"
           class="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
-          placeholder="Ex: Développeur Angular"
+          placeholder="Ex: Angular Developer"
         />
       </div>
 
       <label class="mt-7 inline-flex items-center gap-2 text-sm text-slate-700">
         <input type="checkbox" [(ngModel)]="filterAvailableOnly" class="h-4 w-4" />
-        Afficher uniquement les offres disponibles
+        Show only available offers
       </label>
     </div>
 
@@ -24,21 +24,21 @@
         (click)="applyFilters()"
         class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
       >
-        Filtrer
+        Filter
       </button>
       <button
         type="button"
         (click)="resetFilters()"
         class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
       >
-        Réinitialiser
+        Reset
       </button>
       <button
         type="button"
         (click)="openCreateModal()"
         class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
       >
-        Créer une offre
+        Create an offer
       </button>
     </div>
   </div>

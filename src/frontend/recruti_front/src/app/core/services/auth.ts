@@ -127,7 +127,9 @@ getCurrentUser(): any {
 isRecruteur(): boolean {
   return this.getCurrentUser()?.role === 'RECRUTEUR';
 }
-
+isAdmin(): boolean {
+  return this.getCurrentUser()?.role === 'ADMIN';
+}
 isAuthenticated(): boolean {
   return !!this.getCurrentUser()?.token;
 }
