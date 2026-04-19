@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.recruti.recruti_backend.dto.AuthResponse;
 import tn.recruti.recruti_backend.dto.LoginRequest;
 import tn.recruti.recruti_backend.dto.RegisterRequest;
-import tn.recruti.recruti_backend.service.AuthService;
+import tn.recruti.recruti_backend.service.AuthService; 
 
 /**
  * Controller REST exposant les endpoints publics d'authentification.
