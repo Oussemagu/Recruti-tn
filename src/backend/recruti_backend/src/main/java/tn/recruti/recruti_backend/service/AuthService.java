@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tn.recruti.recruti_backend.Exception.EmailAlreadyUsedException;
 import tn.recruti.recruti_backend.dto.AuthResponse;
 import tn.recruti.recruti_backend.dto.LoginRequest;
 import tn.recruti.recruti_backend.dto.RegisterRequest;
@@ -43,7 +44,7 @@ public class AuthService {
 
         // Vérifie l'unicité de l'email avant création
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use");
+            throw new EmailAlreadyUsedException("Email already in use");
         }
 
         // Construction de l'entité User à partir du DTO

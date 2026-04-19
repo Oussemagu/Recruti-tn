@@ -295,10 +295,50 @@
                   <line x1="12" y1="16" x2="12" y2="12"></line>
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
-                Aucun quiz lié à cette offre. Remplissez les champs pour en créer un.
+                Aucun quiz lié à cette offre. Choisissez une methode de creation.
               </div>
+
+              @if (quizCreationMode() === 'none') {
+                <div style="display:flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                  <button type="button" class="btn btn-primary" (click)="selectQuizCreationMode('manual')">
+                    Créer manuellement
+                  </button>
+                  <button type="button" class="btn btn-secondary" (click)="selectQuizCreationMode('ai')">
+                    Générer avec IA
+                  </button>
+                </div>
+              }
+
+              @if (quizCreationMode() === 'ai') {
+                <div style="border: 1px solid var(--gray-200); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background: #fff;">
+                  <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label for="ai-question-count">Nombre de questions à générer *</label>
+                    <input
+                      id="ai-question-count"
+                      type="number"
+                      min="1"
+                      class="form-control"
+                      [(ngModel)]="aiQuestionsCount"
+                      name="aiQuestionsCount" />
+                  </div>
+
+                  <div style="display:flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      [disabled]="quizSubmitting()"
+                      (click)="generateQuizWithAi(selectedOffer, aiQuestionsCount)">
+                      Lancer génération IA
+                    </button>
+                    <button type="button" class="btn btn-outline" (click)="selectQuizCreationMode('manual')">
+                      Passer en manuel
+                    </button>
+                  </div>
+                </div>
+              }
             }
 
+            @if (selectedQuizId() || quizCreationMode() === 'manual') {
             @for (quizQuestion of quizQuestionsForm; track $index; let questionIndex = $index) {
               <div style="border: 1px solid var(--gray-200); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background: #fff;">
                 <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; gap: 1rem;">
@@ -369,6 +409,7 @@
             <button type="button" class="btn btn-secondary" (click)="addQuestion()">
               Ajouter question
             </button>
+            }
           }
         </div>
 
@@ -381,10 +422,15 @@
           <button type="button" class="btn btn-outline" (click)="closeModals()">
             Fermer
           </button>
+          @if (!selectedQuizId() && quizCreationMode() === 'none') {
+            <button type="button" class="btn btn-primary" disabled>
+              Choisir une methode
+            </button>
+          }
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="quizSubmitting() || quizLoading() || !isQuizFormValid()">
+            [disabled]="quizSubmitting() || quizLoading() || !(selectedQuizId() || quizCreationMode() === 'manual') || !isQuizFormValid()">
             {{ selectedQuizId() ? 'Mettre a jour le quiz' : 'Creer le quiz' }}
           </button>
         </div>

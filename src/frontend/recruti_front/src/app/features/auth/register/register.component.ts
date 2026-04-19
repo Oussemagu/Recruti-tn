@@ -84,7 +84,18 @@ export class RegisterComponent {
         this.router.navigate(['/candidat']);
       },
       error: (err: any) => {
-        this.error = err.error?.message || 'Inscription échouée. Réessayez.';
+        const backendText = typeof err?.error === 'string' ? err.error : '';
+
+        if (err?.status === 409) {
+          this.error = 'Cet email est deja utilise. Connectez-vous ou utilisez un autre email.';
+        } else if (err?.status === 400) {
+          this.error = err.error?.message || 'Donnees invalides. Verifiez les champs obligatoires.';
+        } else if (err?.status === 0) {
+          this.error = 'Impossible de joindre le serveur. Verifiez que le backend est demarre.';
+        } else {
+          this.error = err.error?.message || err.error?.detail || err.error?.error || backendText || 'Inscription echouee. Reessayez.';
+        }
+
         this.loading = false;
       }
     });

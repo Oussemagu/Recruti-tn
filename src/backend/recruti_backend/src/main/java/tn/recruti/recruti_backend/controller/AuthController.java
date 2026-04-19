@@ -1,6 +1,7 @@
 package tn.recruti.recruti_backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.recruti.recruti_backend.dto.AuthResponse;
@@ -17,6 +18,7 @@ import tn.recruti.recruti_backend.service.AuthService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController{
 	// Délègue toute la logique métier au service AuthService
 	private final AuthService authService;    
@@ -43,6 +45,8 @@ public class AuthController{
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login (@RequestBody LoginRequest request){
-    	return ResponseEntity.ok(authService.login(request));
+        AuthResponse response = authService.login(request);
+        log.info("Bearer token (POSTMAN): Bearer {}", response.getToken());
+    	return ResponseEntity.ok(response);
     }
 }

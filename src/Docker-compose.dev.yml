@@ -47,7 +47,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_DEVTOOLS_RESTART_ENABLED: true
     ports:
-      - "9091:8080"
+      - "9091:9091"
     depends_on:
       mysql:
         condition: service_healthy

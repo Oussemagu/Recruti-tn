@@ -3,7 +3,12 @@ package tn.recruti.recruti_backend.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,11 +32,14 @@ import tn.recruti.recruti_backend.repository.OfferRepository;
 import tn.recruti.recruti_backend.repository.PassageRepository;
 import tn.recruti.recruti_backend.repository.QuizRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
+import tn.recruti.recruti_backend.service.QuizAiService;
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class QuizController {
+    @Autowired
+    private QuizAiService aiService;
 
     @Autowired
     OfferRepository offerRepository;
@@ -49,33 +57,230 @@ public class QuizController {
     CandidatureRepository candidatureRepository;
 
     @PostMapping("/createQuiz")
-    public ResponseEntity<?> createQuiz (@RequestBody QuizCreateDto dto){
+    public ResponseEntity<?> createQuiz (@Valid @RequestBody QuizCreateDto dto){
         try {
-            Quiz quiz = new Quiz();
-            quiz.setContenu(dto.getContenu());
-            quiz.setVraiesReponses(dto.getVraiesReponses());
+            if (dto == null || dto.getOfferId() == null) {
+                return ResponseEntity.badRequest().body(new ErrorDto("offerId is required"));
+            }
+
+            int methode = dto.getMethode();
+            if (methode != 0 && methode != 1) {
+                return ResponseEntity.badRequest().body(new ErrorDto("methode must be 0 (manual) or 1 (ai)"));
+            }
 
             Offer offer = offerRepository.findById(dto.getOfferId())
-                    .orElseThrow(() -> new RuntimeException("Offre introuvable"));
+                    .orElseThrow(() -> new NoSuchElementException("Offre introuvable"));
+
+            Quiz quiz = new Quiz();
+            if (methode == 0) {
+                if (isBlank(dto.getContenu()) || isBlank(dto.getVraiesReponses())) {
+                    return ResponseEntity.badRequest().body(new ErrorDto("contenu and vraiesReponses are required for manual mode"));
+                }
+
+                quiz.setContenu(dto.getContenu());
+                quiz.setVraiesReponses(dto.getVraiesReponses());
+            } else {
+                int requestedCount = dto.getNombreQuestions() == null ? 5 : dto.getNombreQuestions();
+
+                // contenu  "[{'question':'...','choix':['A','B','C']}]"
+                // vraiesReponses "['A','C','B']"
+                Map<String, String> generated = aiService.generateQuizFromOffre(
+                    offer.getDescription(), requestedCount
+                );
+
+                String contenu = generated.get("contenu");           // → va dans quiz.setContenu()
+                String vraiesReponses = generated.get("vraiesReponses"); // → va dans quiz.setVraiesReponses()
+                if (isBlank(vraiesReponses)) {
+                    vraiesReponses = buildFallbackAnswersJson(contenu);
+                }
+
+                if (isBlank(contenu)
+                        || isJsonArrayEmpty(contenu) || isJsonArrayEmpty(vraiesReponses)) {
+                    throw new IllegalStateException("AI did not return valid quiz content");
+                }
+
+                // Align AI answers with real choice texts so frontend select can prefill correctly.
+                vraiesReponses = alignAnswersWithChoices(contenu, vraiesReponses);
+
+                quiz.setContenu(contenu);
+                quiz.setVraiesReponses(vraiesReponses);
+            }
 
             quiz.setOffer(offer);
             quiz.setPassage(new ArrayList<>());
 
             offer.setQuiz(quiz);
-
             offerRepository.save(offer);
 
-            // Return DTO instead of full entity
             QuizResponseDto response = new QuizResponseDto(
                     offer.getQuiz().getId(),
                     offer.getQuiz().getContenu(),
                     offer.getQuiz().getVraiesReponses()
             );
             return ResponseEntity.ok(response);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).body(new ErrorDto(
+                    "OFFER_NOT_FOUND",
+                    e.getMessage(),
+                    "Verifie la valeur de offerId et teste GET /api/offers"
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorDto(
+                    "INVALID_REQUEST",
+                    e.getMessage(),
+                    "Verifie le body JSON: offerId + methode (0 ou 1)"
+            ));
+        } catch (IllegalStateException e) {
+            String message = e.getMessage() == null ? "Erreur AI" : e.getMessage();
+            if (message.toLowerCase().contains("clé api") || message.toLowerCase().contains("api key")
+                    || message.toLowerCase().contains("unauthorized") || message.toLowerCase().contains("autorisée")) {
+                return ResponseEntity.status(502).body(new ErrorDto(
+                        "AI_AUTH_ERROR",
+                        message,
+                        "Verifie API_KEY (.env), redemarre le backend, puis reteste"
+                ));
+            }
+
+            return ResponseEntity.status(502).body(new ErrorDto(
+                    "AI_PROVIDER_ERROR",
+                    message,
+                    "Le fournisseur AI a repondu avec une erreur. Verifie le model et la dispo OpenRouter"
+            ));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ErrorDto("Error creating quiz: " + e.getMessage()));
+            return ResponseEntity.status(500).body(new ErrorDto(
+                    "INTERNAL_ERROR",
+                    "Error creating quiz: " + e.getMessage(),
+                    "Verifie les logs backend pour plus de details"
+            ));
         }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private boolean isJsonArrayEmpty(String value) {
+        try {
+            JsonNode node = new ObjectMapper().readTree(value);
+            return node.isArray() && node.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String buildFallbackAnswersJson(String contenuJson) {
+        if (isBlank(contenuJson)) {
+            return "[\"A\"]";
+        }
+        try {
+            JsonNode contenu = new ObjectMapper().readTree(contenuJson);
+            if (!contenu.isArray() || contenu.isEmpty()) {
+                return "[\"A\"]";
+            }
+
+            List<String> answers = new ArrayList<>();
+            for (JsonNode ignored : contenu) {
+                answers.add("A");
+            }
+            return new ObjectMapper().writeValueAsString(answers);
+        } catch (Exception e) {
+            return "[\"A\"]";
+        }
+    }
+
+    private String alignAnswersWithChoices(String contenuJson, String answersJson) {
+        if (isBlank(contenuJson)) {
+            return answersJson;
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode contenuNode = mapper.readTree(contenuJson);
+            if (!contenuNode.isArray() || contenuNode.isEmpty()) {
+                return answersJson;
+            }
+
+            JsonNode answersNode;
+            if (isBlank(answersJson)) {
+                answersNode = mapper.createArrayNode();
+            } else {
+                answersNode = mapper.readTree(answersJson);
+            }
+
+            List<String> aligned = new ArrayList<>();
+            for (int i = 0; i < contenuNode.size(); i++) {
+                JsonNode questionNode = contenuNode.get(i);
+                JsonNode choixNode = questionNode == null ? null : questionNode.get("choix");
+
+                List<String> choices = new ArrayList<>();
+                if (choixNode != null && choixNode.isArray()) {
+                    for (JsonNode choiceNode : choixNode) {
+                        if (choiceNode != null && !choiceNode.isNull()) {
+                            String value = choiceNode.asText();
+                            if (!isBlank(value)) {
+                                choices.add(value.trim());
+                            }
+                        }
+                    }
+                }
+
+                String rawAnswer = null;
+                if (answersNode != null && answersNode.isArray() && i < answersNode.size() && !answersNode.get(i).isNull()) {
+                    rawAnswer = answersNode.get(i).asText();
+                }
+
+                String mapped = mapAnswerTokenToChoice(rawAnswer, choices);
+                if (mapped == null) {
+                    mapped = choices.isEmpty() ? "A" : choices.get(0);
+                }
+                aligned.add(mapped);
+            }
+
+            return mapper.writeValueAsString(aligned);
+        } catch (Exception e) {
+            return answersJson;
+        }
+    }
+
+    private String mapAnswerTokenToChoice(String rawAnswer, List<String> choices) {
+        if (isBlank(rawAnswer) || choices == null || choices.isEmpty()) {
+            return null;
+        }
+
+        String trimmed = rawAnswer.trim();
+
+        for (String choice : choices) {
+            if (choice.equalsIgnoreCase(trimmed)) {
+                return choice;
+            }
+        }
+
+        Integer index = toChoiceIndex(trimmed);
+        if (index != null && index >= 0 && index < choices.size()) {
+            return choices.get(index);
+        }
+
+        return null;
+    }
+
+    private Integer toChoiceIndex(String token) {
+        if (isBlank(token)) {
+            return null;
+        }
+
+        char first = Character.toUpperCase(token.trim().charAt(0));
+        if (first >= 'A' && first <= 'D') {
+            return first - 'A';
+        }
+        if (token.length() == 1 && first >= '1' && first <= '4') {
+            return first - '1';
+        }
+        if (token.length() == 1 && first >= '0' && first <= '3') {
+            return first - '0';
+        }
+
+        return null;
     }
 
     @GetMapping("/getQuiz/{offreId}")
@@ -111,7 +316,15 @@ public class QuizController {
 
         if(quiz !=null) {
             quiz.setContenu(dto.getContenu());
-            quiz.setVraiesReponses(dto.getVraiesReponses());
+
+            String safeAnswers = dto.getVraiesReponses();
+            if (isBlank(safeAnswers)) {
+                safeAnswers = buildFallbackAnswersJson(dto.getContenu());
+            }
+            if (isBlank(safeAnswers)) {
+                safeAnswers = quiz.getVraiesReponses();
+            }
+            quiz.setVraiesReponses(safeAnswers);
 
             offer.setQuiz(quiz);
 
@@ -127,11 +340,27 @@ public class QuizController {
 
 
     @DeleteMapping("/deleteQuiz/{quizId}")
-    public Quiz deleteQuiz(@PathVariable Long quizId){
-        Quiz quiz=quizRepository.findById(quizId)
-                .orElseThrow(()->new RuntimeException("Quiz not found "));
-        quizRepository.deleteById(quizId);
-        return quiz;
+    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId){
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+            Offer offer = quiz.getOffer();
+            if (offer != null) {
+                offer.setQuiz(null);
+                offerRepository.save(offer);
+            }
+
+            List<Passage> passages = passageRepository.findByQuizIdOrderByScoreDesc(quizId);
+            if (passages != null && !passages.isEmpty()) {
+                passageRepository.deleteAll(passages);
+            }
+
+            quizRepository.delete(quiz);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorDto("Error deleting quiz: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/submitQuiz")
@@ -285,8 +514,21 @@ public class QuizController {
     }
 
     @lombok.Data
-    @lombok.AllArgsConstructor
     public static class ErrorDto {
+        private String code;
         private String message;
+        private String hint;
+
+        public ErrorDto(String message) {
+            this.code = "GENERIC_ERROR";
+            this.message = message;
+            this.hint = null;
+        }
+
+        public ErrorDto(String code, String message, String hint) {
+            this.code = code;
+            this.message = message;
+            this.hint = hint;
+        }
     }
 }
