@@ -127,7 +127,6 @@ getCurrentUser(): any {
 isRecruteur(): boolean {
   return this.getCurrentUser()?.role === 'RECRUTEUR';
 }
-<<<<<<< HEAD
 isAdmin(): boolean {
   return this.getCurrentUser()?.role === 'ADMIN';
 }
@@ -137,10 +136,4 @@ isAuthenticated(): boolean {
 getUserByEmail(email: string): Observable<User> {
   return this.http.get<User>(`${this.USERS_API}/by-email?email=${email}`);
 }
-=======
-
-isAuthenticated(): boolean {
-  return !!this.getCurrentUser()?.token;
-}
->>>>>>> origin/test
 }

@@ -3,16 +3,12 @@ package tn.recruti.recruti_backend.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-<<<<<<< HEAD
-
-=======
 import java.util.Map;
 import java.util.NoSuchElementException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
->>>>>>> origin/test
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,20 +32,14 @@ import tn.recruti.recruti_backend.repository.OfferRepository;
 import tn.recruti.recruti_backend.repository.PassageRepository;
 import tn.recruti.recruti_backend.repository.QuizRepository;
 import tn.recruti.recruti_backend.repository.UserRepository;
-<<<<<<< HEAD
-=======
 import tn.recruti.recruti_backend.service.QuizAiService;
->>>>>>> origin/test
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class QuizController {
-<<<<<<< HEAD
-=======
     @Autowired
     private QuizAiService aiService;
->>>>>>> origin/test
 
     @Autowired
     OfferRepository offerRepository;
@@ -67,17 +57,7 @@ public class QuizController {
     CandidatureRepository candidatureRepository;
 
     @PostMapping("/createQuiz")
-<<<<<<< HEAD
-    public ResponseEntity<?> createQuiz (@RequestBody QuizCreateDto dto){
-        try {
-            Quiz quiz = new Quiz();
-            quiz.setContenu(dto.getContenu());
-            quiz.setVraiesReponses(dto.getVraiesReponses());
-
-            Offer offer = offerRepository.findById(dto.getOfferId())
-                    .orElseThrow(() -> new RuntimeException("Offre introuvable"));
-=======
-    public ResponseEntity<?> createQuiz (@Valid @RequestBody QuizCreateDto dto){
+    public ResponseEntity<?> createQuiz(@Valid @RequestBody QuizCreateDto dto) {
         try {
             if (dto == null || dto.getOfferId() == null) {
                 return ResponseEntity.badRequest().body(new ErrorDto("offerId is required"));
@@ -94,7 +74,8 @@ public class QuizController {
             Quiz quiz = new Quiz();
             if (methode == 0) {
                 if (isBlank(dto.getContenu()) || isBlank(dto.getVraiesReponses())) {
-                    return ResponseEntity.badRequest().body(new ErrorDto("contenu and vraiesReponses are required for manual mode"));
+                    return ResponseEntity.badRequest()
+                            .body(new ErrorDto("contenu and vraiesReponses are required for manual mode"));
                 }
 
                 quiz.setContenu(dto.getContenu());
@@ -102,13 +83,12 @@ public class QuizController {
             } else {
                 int requestedCount = dto.getNombreQuestions() == null ? 5 : dto.getNombreQuestions();
 
-                // contenu  "[{'question':'...','choix':['A','B','C']}]"
+                // contenu "[{'question':'...','choix':['A','B','C']}]"
                 // vraiesReponses "['A','C','B']"
                 Map<String, String> generated = aiService.generateQuizFromOffre(
-                    offer.getDescription(), requestedCount
-                );
+                        offer.getDescription(), requestedCount);
 
-                String contenu = generated.get("contenu");           // → va dans quiz.setContenu()
+                String contenu = generated.get("contenu"); // → va dans quiz.setContenu()
                 String vraiesReponses = generated.get("vraiesReponses"); // → va dans quiz.setVraiesReponses()
                 if (isBlank(vraiesReponses)) {
                     vraiesReponses = buildFallbackAnswersJson(contenu);
@@ -118,55 +98,35 @@ public class QuizController {
                         || isJsonArrayEmpty(contenu) || isJsonArrayEmpty(vraiesReponses)) {
                     throw new IllegalStateException("AI did not return valid quiz content");
                 }
-
-                // Align AI answers with real choice texts so frontend select can prefill correctly.
+                // Align AI answers with real choice texts so frontend select can prefill
+                // correctly.
                 vraiesReponses = alignAnswersWithChoices(contenu, vraiesReponses);
-
                 quiz.setContenu(contenu);
                 quiz.setVraiesReponses(vraiesReponses);
             }
->>>>>>> origin/test
 
             quiz.setOffer(offer);
             quiz.setPassage(new ArrayList<>());
 
             offer.setQuiz(quiz);
-<<<<<<< HEAD
-
             offerRepository.save(offer);
 
-            // Return DTO instead of full entity
-=======
-            offerRepository.save(offer);
-
->>>>>>> origin/test
             QuizResponseDto response = new QuizResponseDto(
                     offer.getQuiz().getId(),
                     offer.getQuiz().getContenu(),
-                    offer.getQuiz().getVraiesReponses()
-            );
+                    offer.getQuiz().getVraiesReponses());
             return ResponseEntity.ok(response);
-<<<<<<< HEAD
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(new ErrorDto("Error creating quiz: " + e.getMessage()));
-        }
-    }
-
-=======
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body(new ErrorDto(
                     "OFFER_NOT_FOUND",
                     e.getMessage(),
-                    "Verifie la valeur de offerId et teste GET /api/offers"
-            ));
+                    "Verifie la valeur de offerId et teste GET /api/offers"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new ErrorDto(
                     "INVALID_REQUEST",
                     e.getMessage(),
-                    "Verifie le body JSON: offerId + methode (0 ou 1)"
-            ));
+                    "Verifie le body JSON: offerId + methode (0 ou 1)"));
         } catch (IllegalStateException e) {
             String message = e.getMessage() == null ? "Erreur AI" : e.getMessage();
             if (message.toLowerCase().contains("clé api") || message.toLowerCase().contains("api key")
@@ -174,22 +134,19 @@ public class QuizController {
                 return ResponseEntity.status(502).body(new ErrorDto(
                         "AI_AUTH_ERROR",
                         message,
-                        "Verifie API_KEY (.env), redemarre le backend, puis reteste"
-                ));
+                        "Verifie API_KEY (.env), redemarre le backend, puis reteste"));
             }
 
             return ResponseEntity.status(502).body(new ErrorDto(
                     "AI_PROVIDER_ERROR",
                     message,
-                    "Le fournisseur AI a repondu avec une erreur. Verifie le model et la dispo OpenRouter"
-            ));
+                    "Le fournisseur AI a repondu avec une erreur. Verifie le model et la dispo OpenRouter"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(new ErrorDto(
                     "INTERNAL_ERROR",
                     "Error creating quiz: " + e.getMessage(),
-                    "Verifie les logs backend pour plus de details"
-            ));
+                    "Verifie les logs backend pour plus de details"));
         }
     }
 
@@ -262,7 +219,8 @@ public class QuizController {
                 }
 
                 String rawAnswer = null;
-                if (answersNode != null && answersNode.isArray() && i < answersNode.size() && !answersNode.get(i).isNull()) {
+                if (answersNode != null && answersNode.isArray() && i < answersNode.size()
+                        && !answersNode.get(i).isNull()) {
                     rawAnswer = answersNode.get(i).asText();
                 }
 
@@ -319,9 +277,8 @@ public class QuizController {
         return null;
     }
 
->>>>>>> origin/test
     @GetMapping("/getQuiz/{offreId}")
-    public ResponseEntity<?> getQuiz(@PathVariable Long offreId){
+    public ResponseEntity<?> getQuiz(@PathVariable Long offreId) {
         try {
             Offer offer = offerRepository.findById(offreId)
                     .orElseThrow(() -> new RuntimeException("Offre not found"));
@@ -332,8 +289,7 @@ public class QuizController {
                 QuizResponseDto response = new QuizResponseDto(
                         quiz.getId(),
                         quiz.getContenu(),
-                        quiz.getVraiesReponses()
-                );
+                        quiz.getVraiesReponses());
                 return ResponseEntity.ok(response);
             }
             return ResponseEntity.status(404).body(new ErrorDto("No quiz associated with this offer"));
@@ -343,20 +299,15 @@ public class QuizController {
         }
     }
 
-
     @PutMapping("/updateQuiz")
-    public ResponseEntity<Quiz> updateQuiz (@RequestBody QuizCreateDto dto){
-        Offer offer=offerRepository.findById(dto.getOfferId())
-                .orElseThrow(()->new RuntimeException("Offer not found for this Quiz"));
+    public ResponseEntity<Quiz> updateQuiz(@RequestBody QuizCreateDto dto) {
+        Offer offer = offerRepository.findById(dto.getOfferId())
+                .orElseThrow(() -> new RuntimeException("Offer not found for this Quiz"));
 
-        Quiz quiz=offer.getQuiz();
+        Quiz quiz = offer.getQuiz();
 
-        if(quiz !=null) {
+        if (quiz != null) {
             quiz.setContenu(dto.getContenu());
-<<<<<<< HEAD
-            quiz.setVraiesReponses(dto.getVraiesReponses());
-=======
-
             String safeAnswers = dto.getVraiesReponses();
             if (isBlank(safeAnswers)) {
                 safeAnswers = buildFallbackAnswersJson(dto.getContenu());
@@ -365,12 +316,8 @@ public class QuizController {
                 safeAnswers = quiz.getVraiesReponses();
             }
             quiz.setVraiesReponses(safeAnswers);
->>>>>>> origin/test
-
             offer.setQuiz(quiz);
-
             offerRepository.save(offer);
-
             return ResponseEntity.ok(quiz);
 
         }
@@ -379,16 +326,8 @@ public class QuizController {
 
     }
 
-
     @DeleteMapping("/deleteQuiz/{quizId}")
-<<<<<<< HEAD
-    public Quiz deleteQuiz(@PathVariable Long quizId){
-        Quiz quiz=quizRepository.findById(quizId)
-                .orElseThrow(()->new RuntimeException("Quiz not found "));
-        quizRepository.deleteById(quizId);
-        return quiz;
-=======
-    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId){
+    public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId)
                     .orElseThrow(() -> new RuntimeException("Quiz not found"));
@@ -398,7 +337,6 @@ public class QuizController {
                 offer.setQuiz(null);
                 offerRepository.save(offer);
             }
-
             List<Passage> passages = passageRepository.findByQuizIdOrderByScoreDesc(quizId);
             if (passages != null && !passages.isEmpty()) {
                 passageRepository.deleteAll(passages);
@@ -409,7 +347,6 @@ public class QuizController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ErrorDto("Error deleting quiz: " + e.getMessage()));
         }
->>>>>>> origin/test
     }
 
     @PostMapping("/submitQuiz")
@@ -425,7 +362,8 @@ public class QuizController {
 
             // Check if candidate has already taken this quiz
             if (passageRepository.findLatestPassageByCandidatAndQuiz(candidat.getId(), quiz.getId()).isPresent()) {
-                return ResponseEntity.status(409).body(new ErrorDto("You have already taken this quiz. Each candidate can only take the quiz once."));
+                return ResponseEntity.status(409).body(
+                        new ErrorDto("You have already taken this quiz. Each candidate can only take the quiz once."));
             }
 
             // Parse the correct answers
@@ -451,8 +389,8 @@ public class QuizController {
             if (dto.getAnswers() != null && !correctAnswers.isEmpty()) {
                 int maxQuestions = Math.min(dto.getAnswers().size(), correctAnswers.size());
                 for (int i = 0; i < maxQuestions; i++) {
-                    if (dto.getAnswers().get(i) != null && 
-                        dto.getAnswers().get(i).equalsIgnoreCase(correctAnswers.get(i))) {
+                    if (dto.getAnswers().get(i) != null &&
+                            dto.getAnswers().get(i).equalsIgnoreCase(correctAnswers.get(i))) {
                         score++;
                     }
                 }
@@ -474,8 +412,7 @@ public class QuizController {
                     passage.getId(),
                     passage.getScore(),
                     correctAnswers.size(),
-                    passage.getDatePassage()
-            ));
+                    passage.getDatePassage()));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new ErrorDto(e.getMessage()));
         }
@@ -503,7 +440,8 @@ public class QuizController {
                     .map(p -> {
                         String cvPath = ""; // Default empty
                         // Try to get CV path from candidature
-                        // Note: This assumes there's a method to find candidature by candidate and offer
+                        // Note: This assumes there's a method to find candidature by candidate and
+                        // offer
                         try {
                             // For now, we'll leave CV path empty and fetch it from candidature if available
                             cvPath = ""; // Will be fetched on frontend if needed
@@ -511,7 +449,7 @@ public class QuizController {
                             // If there's an error, just use empty path
                             cvPath = "";
                         }
-                        
+
                         return new PassageWithCandidateDto(
                                 p.getId(),
                                 p.getCandidat().getId(),
@@ -520,8 +458,7 @@ public class QuizController {
                                 p.getCandidat().getEmail() != null ? p.getCandidat().getEmail() : "N/A",
                                 p.getScore(),
                                 p.getDatePassage(),
-                                cvPath
-                        );
+                                cvPath);
                     }).toList();
 
             return ResponseEntity.ok(result);
@@ -542,7 +479,7 @@ public class QuizController {
         private String candidatEmail;
         private int score;
         private LocalDate datePassage;
-        private String cvPath;  // CV file path
+        private String cvPath; // CV file path
     }
 
     @lombok.Data
@@ -563,11 +500,6 @@ public class QuizController {
     }
 
     @lombok.Data
-<<<<<<< HEAD
-    @lombok.AllArgsConstructor
-    public static class ErrorDto {
-        private String message;
-=======
     public static class ErrorDto {
         private String code;
         private String message;
@@ -584,6 +516,5 @@ public class QuizController {
             this.message = message;
             this.hint = hint;
         }
->>>>>>> origin/test
     }
 }
