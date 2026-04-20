@@ -12,7 +12,7 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
         <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
       </svg>
-      Toutes les offres
+      All Offers
     </a>
 
     <a *ngIf="isRecruteur()"
@@ -22,11 +22,21 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
       </svg>
-      Mes offres
+      My Offers
+    </a>
+
+    <!-- ✅ Dashboard link for ADMIN -->
+    <a *ngIf="isAdmin()"
+       class="nav-item"
+       routerLink="/admin/dashboard"
+       routerLinkActive="nav-item--active">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+      </svg>
+      Dashboard
     </a>
   </div>
-
-  <div class="navbar-right">
+   <div class="navbar-right">
     <div class="profile-dropdown-wrapper" (clickOutside)="closeProfileDropdown()">
 
       <!-- ✅ Icône profil avec couleur fixe -->
@@ -120,15 +130,16 @@
       </div>
     </div>
   </div>
-</nav>
 
+  <!-- rest of the navbar code remains the same -->
+</nav>
 <router-outlet></router-outlet>
 <!-- ✅ MODAL ÉDITION PROFIL -->
 <div class="modal-overlay" *ngIf="showEditModal()" (click)="closeEditModal()">
   <div class="modal-box" @modalAnim (click)="$event.stopPropagation()">
 
     <div class="modal-header">
-      <h2 class="modal-title">Modifier le profil</h2>
+      <h2 class="modal-title">Edit Profile</h2>
       <button class="modal-close-btn" (click)="closeEditModal()">✕</button>
     </div>
 

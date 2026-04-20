@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
+import {Router} from '@angular/router';
+import { AuthService } from '../../core/services/auth';
 interface ScheduleInterviewRequest {
   candidateName:   string;
   candidateEmail:  string;
@@ -41,18 +42,20 @@ export class ScheduleInterviewComponent implements OnInit {
   private readonly GOOGLE_API = 'http://localhost:9091/api/google';
 
   candidate = {
-    name:           'John Doe',
-    role:           'Principal Product Architect',
-    location:       'San Francisco, CA',
-    experience:     '12+ Years Experience',
+    name:           '',
+    role:           '',
+    location:       '',
+    experience:     '',
     avatar:         'https://i.pravatar.cc/150?img=7',
-    email:          'oussemaguerriche@gmail.com',
-    recruiterEmail: 'oussemaguerriche1@gmail.com',
-    skills:         ['Distributed Systems', 'Strategic Vision', 'FinTech'],
+    email:          '',
+    recruiterEmail: '',
+    score:'',
+    jobOfferDescription:  '',
+    skills:        [] as string[],
     interviewContext:
-      'John is moving into the Final Executive Round. Focus on cultural alignment and technical scalability vision.'
+      '${{candidateName}} is moving into the Final Executive Round. Focus on cultural alignment and technical scalability vision.'
   };
-
+ 
   dayLabels  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   monthNames = [
     'January','February','March','April','May','June',
@@ -82,14 +85,37 @@ export class ScheduleInterviewComponent implements OnInit {
   googleNotConnected: boolean = false;
   isConnecting:       boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient , private router: Router,  private authService: AuthService) {}
 
-  ngOnInit(): void {
-    const today       = new Date();
-    this.currentMonth = today.getMonth();
-    this.currentYear  = today.getFullYear();
-    this.buildCalendar();
+ngOnInit(): void {
+  const state = history.state;
+  console.log('Navigation state:', state); // Debug log to verify state contents
+  // ── Depuis le state (déjà dispo, pas besoin de fetch) ──
+  this.candidate.name             = state?.candidateName  ?? '';
+  this.candidate.email            = state?.candidateEmail ?? '';
+  this.candidate.interviewContext = `Interview for the offer : ${state?.offerTitle ?? ''}`;
+  this.candidate.jobOfferDescription = `Job Offer description : ${state?.offerDescription ?? ''}`;
+  // ── Recruteur depuis currentUser ──
+  this.candidate.recruiterEmail = this.authService.currentUser()?.email ?? '';
+  this.candidate.score = state?.candidateScore ? `${state.candidateScore}` : '';
+  // ── Champs complémentaires du candidat via fetch ──
+  if (state?.candidateEmail) {
+    this.authService.getUserByEmail(state.candidateEmail).subscribe({
+      next: (user) => {
+        this.candidate.location = user.gouvernorat ?? '';
+        this.candidate.skills   = user.skills
+                                    ? user.skills.split(',').map(s => s.trim())
+                                    : [];
+      },
+      error: (err) => console.error('Erreur chargement candidat:', err)
+    });
   }
+
+  const today       = new Date();
+  this.currentMonth = today.getMonth();
+  this.currentYear  = today.getFullYear();
+  this.buildCalendar();
+}
 
   buildCalendar(): void {
     const today    = new Date();

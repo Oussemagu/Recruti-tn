@@ -26,7 +26,15 @@ public class UserService {
     // ─── Helper: Get Current User ───────────────────────────────────────────────
 
     /**
-     * Extracts the current authenticated user's ID from the Spring Security context.
+     * <<<<<<< HEAD
+     * Extracts the current authenticated user's ID from the Spring Security
+     * context.
+     * 
+     * =======
+     * Extracts the current authenticated user's ID from the Spring Security
+     * context.
+     * >>>>>>> origin/test
+     * 
      * @return The user ID of the currently authenticated user
      * @throws IllegalStateException if no user is authenticated
      */
@@ -86,14 +94,22 @@ public class UserService {
     public UserDTO updateUser(Long id, UpdateUserRequest request) {
         User user = findUserOrThrow(id);
 
-        if (request.getNom() != null)           user.setNom(request.getNom());
-        if (request.getPrenom() != null)        user.setPrenom(request.getPrenom());
-        if (request.getDateNaissance() != null) user.setDateNaissance(request.getDateNaissance());
-        if (request.getSkills() != null)        user.setSkills(request.getSkills());
-        if (request.getSexe() != null)          user.setSexe(request.getSexe());
-        if (request.getGouvernorat() != null)   user.setGouvernorat(request.getGouvernorat());
-        if (request.getPoste() != null)         user.setPoste(request.getPoste());
-        if (request.getNomSociete() != null)    user.setNomSociete(request.getNomSociete());
+        if (request.getNom() != null)
+            user.setNom(request.getNom());
+        if (request.getPrenom() != null)
+            user.setPrenom(request.getPrenom());
+        if (request.getDateNaissance() != null)
+            user.setDateNaissance(request.getDateNaissance());
+        if (request.getSkills() != null)
+            user.setSkills(request.getSkills());
+        if (request.getSexe() != null)
+            user.setSexe(request.getSexe());
+        if (request.getGouvernorat() != null)
+            user.setGouvernorat(request.getGouvernorat());
+        if (request.getPoste() != null)
+            user.setPoste(request.getPoste());
+        if (request.getNomSociete() != null)
+            user.setNomSociete(request.getNomSociete());
 
         // Email uniqueness check before updating
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
@@ -121,6 +137,7 @@ public class UserService {
     /**
      * Verify if the currently authenticated user provided the correct password.
      * Used before account deletion for security.
+     * 
      * @param password Plain text password to verify
      * @return true if password is correct, false otherwise
      */
@@ -131,7 +148,8 @@ public class UserService {
 
     /**
      * Verify if the provided password matches the user's stored password.
-     * @param id User ID
+     * 
+     * @param id       User ID
      * @param password Plain text password to verify
      * @return true if password is correct, false otherwise
      */
@@ -187,5 +205,11 @@ public class UserService {
         }
 
         return dto;
+    }
+
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RessourceNotFoundException("User not found with email: " + email));
+        return toDTO(user);
     }
 }

@@ -8,6 +8,8 @@ export interface QuizCreateRequest {
   contenu: string;
   vraiesReponses: string;
   offerId: number;
+  methode: number;
+  nombreQuestions?: number;
 }
 
 export interface QuizSubmissionRequest {

@@ -58,6 +58,12 @@
 			<optional>true</optional>
 		</dependency>
 
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
 		<!-- Jakarta Validation -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -91,6 +97,10 @@
 		    <artifactId>jjwt-api</artifactId>
 		    <version>0.12.3</version>
 		</dependency>
+			<dependency>
+		<groupId>tools.jackson.core</groupId>
+		<artifactId>jackson-databind</artifactId>
+	</dependency>
 		<dependency>
 		    <groupId>io.jsonwebtoken</groupId>
 		    <artifactId>jjwt-impl</artifactId>
