@@ -55,7 +55,9 @@ export class MyOffersComponent implements OnInit {
   quizLoading = signal<boolean>(false);
   quizSubmitting = signal<boolean>(false);
   selectedQuizId = signal<number | null>(null);
+  quizCreationMode = signal<'none' | 'manual' | 'ai'>('none');
   quizQuestionsForm: QuizQuestionForm[] = [];
+  aiQuestionsCount = 5;
 
   // Formulaire
   formData = {
@@ -182,6 +184,8 @@ export class MyOffersComponent implements OnInit {
       }
     ];
     this.selectedQuizId.set(null);
+    this.quizCreationMode.set('none');
+    this.aiQuestionsCount = 5;
   }
 
   addQuestion(): void {
@@ -424,7 +428,46 @@ export class MyOffersComponent implements OnInit {
   openQuizModal(offer: OfferResponse): void {
     this.selectedOffer = offer;
     this.showQuizModal.set(true);
+    this.quizCreationMode.set('none');
     this.loadQuizForOffer(offer.id);
+  }
+
+  selectQuizCreationMode(mode: 'manual' | 'ai'): void {
+    this.quizCreationMode.set(mode);
+  }
+
+  generateQuizWithAi(offer: OfferResponse, questionsCount: number): void {
+    if (!Number.isInteger(questionsCount) || questionsCount <= 0) {
+      this.error.set('Le nombre de questions doit etre un entier strictement positif.');
+      return;
+    }
+
+    this.selectedOffer = offer;
+    this.quizSubmitting.set(true);
+    this.error.set(null);
+
+    const payload: QuizCreateRequest = {
+      contenu: '',
+      vraiesReponses: '',
+      offerId: offer.id,
+      methode: 1,
+      nombreQuestions: questionsCount
+    };
+
+    this.quizService.createQuiz(payload).subscribe({
+      next: () => {
+        this.success.set(`Quiz IA genere avec succes (${questionsCount} question(s)).`);
+        this.quizSubmitting.set(false);
+        this.quizCreationMode.set('manual');
+        this.openQuizModal(offer);
+        setTimeout(() => this.success.set(null), 3000);
+      },
+      error: (err: any) => {
+        this.error.set('Erreur lors de la generation du quiz avec IA');
+        this.quizSubmitting.set(false);
+        console.error(err);
+      }
+    });
   }
 
   loadQuizForOffer(offerId: number): void {
@@ -451,7 +494,7 @@ export class MyOffersComponent implements OnInit {
         this.quizQuestionsForm = (Array.isArray(contenu) ? contenu : []).map((item, index) => ({
           question: item?.question ?? '',
           choix: Array.isArray(item?.choix) && item.choix.length > 0 ? item.choix : ['', ''],
-          vraieReponse: vraiesReponses[index] ?? ''
+          vraieReponse: this.resolveTrueAnswer(vraiesReponses[index], Array.isArray(item?.choix) && item.choix.length > 0 ? item.choix : ['', ''])
         }));
 
         if (this.quizQuestionsForm.length === 0) {
@@ -459,11 +502,13 @@ export class MyOffersComponent implements OnInit {
         }
 
         this.selectedQuizId.set(quiz.id);
+        this.quizCreationMode.set('manual');
         this.quizLoading.set(false);
       },
       error: (err: any) => {
         if (err.status === 404) {
           this.resetQuizForm();
+          this.quizCreationMode.set('none');
         } else {
           this.error.set('Erreur lors du chargement du quiz');
           console.error(err);
@@ -504,7 +549,8 @@ export class MyOffersComponent implements OnInit {
     const payload: QuizCreateRequest = {
       contenu: JSON.stringify(contenuPayload),
       vraiesReponses: JSON.stringify(vraiesReponsesPayload),
-      offerId: this.selectedOffer.id
+      offerId: this.selectedOffer.id,
+      methode: 0
     };
 
     const isUpdate = this.selectedQuizId() !== null;
@@ -541,12 +587,32 @@ export class MyOffersComponent implements OnInit {
     );
   }
 
+  private resolveTrueAnswer(rawAnswer: string | undefined, choices: string[]): string {
+    const answer = (rawAnswer ?? '').trim();
+    if (!answer) {
+      return '';
+    }
+
+    const directMatch = choices.find((choice) => choice.trim().toLowerCase() === answer.toLowerCase());
+    if (directMatch) {
+      return directMatch;
+    }
+
+    const token = answer.charAt(0).toUpperCase();
+    if (token >= 'A' && token <= 'D') {
+      const idx = token.charCodeAt(0) - 'A'.charCodeAt(0);
+      if (idx >= 0 && idx < choices.length) {
+        return choices[idx];
+      }
+    }
+
+    return '';
+  }
+
   confirmDeleteQuiz(): void {
     const quizId = this.selectedQuizId();
     if (!quizId) return;
-
-    const isConfirmed = window.confirm('Supprimer ce quiz ? Cette action est irréversible.');
-    if (!isConfirmed) return;
+    if (!this.selectedOffer) return;
 
     this.quizSubmitting.set(true);
     this.error.set(null);
@@ -554,6 +620,7 @@ export class MyOffersComponent implements OnInit {
     this.quizService.deleteQuiz(quizId).subscribe({
       next: () => {
         this.resetQuizForm();
+        this.loadQuizForOffer(this.selectedOffer!.id);
         this.success.set('Quiz supprimé avec succès !');
         this.quizSubmitting.set(false);
         setTimeout(() => this.success.set(null), 3000);

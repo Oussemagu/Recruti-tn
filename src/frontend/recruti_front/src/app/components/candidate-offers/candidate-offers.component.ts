@@ -36,7 +36,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class CandidateOffersComponent implements OnInit {  // ← implémenter OnInit
   auth = inject(AuthService);
   private router = inject(Router);
-   showProfileDropdown = false;
+
+  showProfileDropdown = false;
   showEditModal = signal(false);
   isSubmitting = signal(false);
   errorMessage = signal('');

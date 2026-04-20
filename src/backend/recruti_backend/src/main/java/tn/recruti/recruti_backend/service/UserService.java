@@ -26,8 +26,14 @@ public class UserService {
     // ─── Helper: Get Current User ───────────────────────────────────────────────
 
     /**
+     * <<<<<<< HEAD
      * Extracts the current authenticated user's ID from the Spring Security
      * context.
+     * 
+     * =======
+     * Extracts the current authenticated user's ID from the Spring Security
+     * context.
+     * >>>>>>> origin/test
      * 
      * @return The user ID of the currently authenticated user
      * @throws IllegalStateException if no user is authenticated

@@ -1,0 +1,37 @@
+<button class="chat-toggle" type="button" (click)="toggle()" aria-label="Open chatbot">
+  Assistant
+</button>
+
+@if (isOpen()) {
+  <section class="chat-panel">
+    <header class="chat-header">
+      <strong>Assistant Recruti.tn</strong>
+      <button type="button" class="close-btn" (click)="toggle()">X</button>
+    </header>
+
+    <div class="chat-messages">
+      @for (msg of messages(); track $index) {
+        <div class="msg" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          {{ msg.content }}
+        </div>
+      }
+    </div>
+
+    <div class="quick-links">
+      @for (url of quickUrls(); track url) {
+        <button type="button" (click)="goTo(url)">{{ url }}</button>
+      }
+    </div>
+
+    <form class="chat-input" (ngSubmit)="ask()">
+      <input
+        type="text"
+        name="message"
+        [(ngModel)]="input"
+        placeholder="Pose une question..."
+        [disabled]="loading()"
+      />
+      <button type="submit" [disabled]="loading()">Envoyer</button>
+    </form>
+  </section>
+}
